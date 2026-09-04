@@ -67,7 +67,8 @@
   --color-border: var(--border);
   --color-ring: var(--ring);
   --radius: var(--radius);
-  --font-sans: var(--font-sans); /* We will let tailwind handle this or define custom classes */
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
 }
 
 @layer base {
@@ -80,17 +81,44 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    /* By default use sans-serif */
+    font-family: var(--font-sans);
+    line-height: 1.6;
   }
   
   /* Headings with Serif Font */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-lora), serif;
+  h1, h2, h3, h4, h5, h6, .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
   }
 }
 
 @layer utilities {
   .academic-card {
     @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Hide Next.js dev indicator globally */
+nextjs-portal {
+  display: none !important;
+}
+
+/* Mobile touch improvements */
+@media (max-width: 1024px) {
+  /* Larger tap targets */
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Smooth scroll momentum */
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  /* Prevent text size adjustment */
+  html {
+    -webkit-text-size-adjust: 100%;
   }
 }

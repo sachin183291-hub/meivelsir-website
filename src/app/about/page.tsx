@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { profileData, mockEducation, mockExpertise } from "@/data/mockData";
+import { profileData, mockEducation, mockExpertise, mockEstablishedLabs, mockMemberships } from "@/data/mockData";
 import { GraduationCap, Award, BookOpen, Lightbulb, CheckCircle2 } from "lucide-react";
 
 export default function AboutPage() {
@@ -84,6 +84,30 @@ export default function AboutPage() {
                   <li key={skill} className="flex items-center text-foreground/80 font-medium">
                     <CheckCircle2 className="w-5 h-5 text-primary mr-3 shrink-0" />
                     {skill}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="academic-card p-8">
+              <h3 className="text-xl font-serif font-bold text-foreground mb-6">Established Labs</h3>
+              <ul className="space-y-4">
+                {mockEstablishedLabs.map((lab, idx) => (
+                  <li key={idx} className="flex items-start text-foreground/80 font-medium">
+                    <CheckCircle2 className="w-5 h-5 text-primary mr-3 shrink-0 mt-0.5" />
+                    <span>{lab}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="academic-card p-8 border-t-4 border-t-secondary">
+              <h3 className="text-xl font-serif font-bold text-foreground mb-6">Professional Memberships</h3>
+              <ul className="space-y-4">
+                {mockMemberships.map((membership, idx) => (
+                  <li key={idx} className="flex items-start text-foreground/80 font-medium">
+                    <CheckCircle2 className="w-5 h-5 text-secondary mr-3 shrink-0 mt-0.5" />
+                    <span>{membership}</span>
                   </li>
                 ))}
               </ul>

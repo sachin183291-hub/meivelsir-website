@@ -1,10 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Cpu, Brain, Wifi, Eye, Database, Shield, Radio, Activity, BookOpen, Quote } from "lucide-react";
+import { Cpu, Brain, Wifi, Eye, Database, Shield, Radio, Activity, BookOpen, Quote, Plus } from "lucide-react";
 import { profileData } from "@/data/mockData";
+import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import AddContentModal from "@/components/modals/AddContentModal";
+import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 
 export default function ResearchPage() {
+  const { isAdmin } = useAuth();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  const handleAddClick = () => {
+    if (isAdmin) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
   const domains = [
     { name: "Artificial Intelligence", icon: Brain, color: "text-blue-600", bg: "bg-blue-600/10", pubs: 45 },
     { name: "Internet of Things", icon: Wifi, color: "text-emerald-600", bg: "bg-emerald-600/10", pubs: 32 },
@@ -16,15 +32,40 @@ export default function ResearchPage() {
     { name: "Wireless Comm.", icon: Radio, color: "text-cyan-600", bg: "bg-cyan-600/10", pubs: 15 },
   ];
 
+  const rdWorkStats = [
+    { label: "SCI Journals published", value: "7" },
+    { label: "Scopus Journals published", value: "20" },
+    { label: "Patents Granted & Published", value: "16 & 6" },
+    { label: "Presented International Conferences", value: "24" },
+    { label: "Funding Proposals Applied & Selected", value: "43 & 7" },
+    { label: "Consultancy work Funded", value: "2" },
+    { label: "Research projects completed", value: "6" },
+    { label: "Makeathon Contest organised & participated", value: "3 & 2" },
+    { label: "Workshop/Internship programs (Texas CoE)", value: "10" },
+    { label: "FDP & IPR programs attended", value: "43" },
+    { label: "FDP organized", value: "7" },
+    { label: "Labs Established", value: "3" },
+    { label: "MoU Organized (B&R Automation)", value: "1" },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
+        <button 
+          onClick={handleAddClick}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          Add Research Domain
+        </button>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="space-y-20"
       >
-        
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground">Research & Innovation</h1>
@@ -67,6 +108,29 @@ export default function ResearchPage() {
           </div>
         </section>
 
+        {/* R&D Work Milestones */}
+        <section>
+          <div className="mb-10">
+            <h2 className="text-3xl font-serif font-bold text-foreground">Completed R&D Tasks</h2>
+            <div className="h-1 w-16 bg-primary mt-4 rounded"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {rdWorkStats.map((stat, idx) => (
+              <div 
+                key={idx}
+                className="academic-card p-6 flex flex-col justify-between border-l-4 hover:border-l-primary transition-all duration-300"
+              >
+                <p className="text-sm font-bold text-foreground/60 uppercase tracking-wide mb-4 leading-snug">
+                  {stat.label}
+                </p>
+                <div className="text-3xl font-serif font-black text-foreground">
+                  {stat.value}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Research Domains Grid */}
         <section>
           <div className="mb-10">
@@ -95,6 +159,22 @@ export default function ResearchPage() {
         </section>
 
       </motion.div>
+
+      <AddContentModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        title="Add Research Domain"
+        type="research" as any
+      />
+
+      <PasswordPromptModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSuccess={() => {
+          setIsPasswordModalOpen(false);
+          setIsAddModalOpen(true);
+        }}
+      />
     </div>
   );
 }

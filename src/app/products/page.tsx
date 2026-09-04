@@ -1,32 +1,73 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Package, ExternalLink } from "lucide-react";
+import { Package, ExternalLink, Plus, Pencil } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import AddContentModal from "@/components/modals/AddContentModal";
+import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
+import ViewProductModal from "@/components/modals/ViewProductModal";
+import { Product } from "@/types";
+import Image from "next/image";
+
+const initialProducts: Product[] = [
+  {
+    id: "prod-1",
+    name: "MediVision AI",
+    category: "Healthcare Diagnostic Tool",
+    description: "An AI-powered diagnostic tool capable of identifying early-stage neurological disorders from MRI scans with 95% accuracy.",
+    status: "Commercialized",
+    year: 2024,
+    tech: ["PyTorch", "React", "Python"],
+  },
+  {
+    id: "prod-2",
+    name: "SecureNode IoT",
+    category: "Smart City Infrastructure",
+    description: "A lightweight hardware-software solution for securing edge sensors in urban environments against cyber-attacks.",
+    status: "Research Prototype",
+    year: 2025,
+    tech: ["C++", "Embedded Linux", "Cryptography"],
+  }
+];
 
 export default function ProductsPage() {
-  const mockProducts = [
-    {
-      id: "prod-1",
-      name: "MediVision AI",
-      category: "Healthcare Diagnostic Tool",
-      description: "An AI-powered diagnostic tool capable of identifying early-stage neurological disorders from MRI scans with 95% accuracy.",
-      status: "Commercialized",
-      year: 2024,
-      tech: ["PyTorch", "React", "Python"],
-    },
-    {
-      id: "prod-2",
-      name: "SecureNode IoT",
-      category: "Smart City Infrastructure",
-      description: "A lightweight hardware-software solution for securing edge sensors in urban environments against cyber-attacks.",
-      status: "Research Prototype",
-      year: 2025,
-      tech: ["C++", "Embedded Linux", "Cryptography"],
+  const { isAdmin } = useAuth();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+
+  const handleAddClick = () => {
+    if (isAdmin) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
     }
-  ];
+  };
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+    if (isAdmin) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen relative">
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
+        <button 
+          onClick={handleAddClick}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          Add Product
+        </button>
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -39,17 +80,30 @@ export default function ProductsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {mockProducts.map((product, index) => (
+          {products.map((product, index) => (
             <motion.div 
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="academic-card overflow-hidden flex flex-col h-full"
+              className="academic-card overflow-hidden flex flex-col h-full group"
             >
-              <div className="h-48 bg-accent flex items-center justify-center relative overflow-hidden group">
-                <Package className="w-16 h-16 text-primary/40 group-hover:scale-110 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60"></div>
+              <div className="h-48 bg-accent flex items-center justify-center relative overflow-hidden shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent opacity-60 z-10"></div>
+                
+                {product.images && product.images.length > 0 ? (
+                  <Image src={product.images[0]} alt={product.name} fill className="object-cover z-0 group-hover:scale-105 transition-transform duration-700" />
+                ) : (
+                  <Package className="w-16 h-16 text-primary/40 group-hover:scale-110 transition-transform duration-500 z-0" />
+                )}
+
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleEditClick(product); }}
+                  className="absolute top-4 right-4 z-20 p-2 bg-black/40 backdrop-blur-md text-white hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                  title="Edit Product"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
               </div>
               
               <div className="p-6 flex-grow flex flex-col space-y-4">
@@ -79,7 +133,10 @@ export default function ProductsPage() {
               </div>
               
               <div className="p-6 pt-0 mt-auto">
-                <button className="w-full flex items-center justify-center py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium">
+                <button 
+                  onClick={() => setViewingProduct(product)}
+                  className="w-full flex items-center justify-center py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors font-medium"
+                >
                   <ExternalLink className="w-4 h-4 mr-2" /> View Product Demo
                 </button>
               </div>
@@ -87,6 +144,38 @@ export default function ProductsPage() {
           ))}
         </div>
       </motion.div>
+
+      <AddContentModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => { setIsAddModalOpen(false); setEditingProduct(null); }} 
+        title={editingProduct ? "Edit Product" : "Add New Product"}
+        type="product"
+        initialData={editingProduct}
+        onSave={(data) => {
+          if (editingProduct) {
+            setProducts(products.map(p => p.id === editingProduct.id ? { ...data, id: p.id } : p));
+          } else {
+            setProducts([{ ...data, id: Date.now().toString() }, ...products]);
+          }
+          setIsAddModalOpen(false);
+          setEditingProduct(null);
+        }}
+      />
+
+      <PasswordPromptModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => { setIsPasswordModalOpen(false); setEditingProduct(null); }}
+        onSuccess={() => {
+          setIsPasswordModalOpen(false);
+          setIsAddModalOpen(true);
+        }}
+      />
+
+      <ViewProductModal 
+        isOpen={viewingProduct !== null} 
+        onClose={() => setViewingProduct(null)} 
+        product={viewingProduct} 
+      />
     </div>
   );
 }

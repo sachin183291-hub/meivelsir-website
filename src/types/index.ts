@@ -122,4 +122,26 @@ export interface Event {
   date: string;
   location?: string;
   description?: string;
+  images?: string[];
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  status: string;
+  year: number;
+  tech: string[];
+  images?: string[];
+}
+
+export interface FundingProposal {
+  id: string;
+  organization: string;
+  investigator: string;
+  yearsApplied: string;
+  applied?: number;
+  confirmed?: number | string;
+  fundedGranted?: number | string;
 }

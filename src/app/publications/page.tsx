@@ -2,20 +2,46 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, FileText, ExternalLink, ChevronDown } from "lucide-react";
-import { mockPublications } from "@/data/mockData";
+import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus } from "lucide-react";
+import { mockPublications, sciJournals } from "@/data/publicationsData";
+import { internationalConferences } from "@/data/conferencesData";
+import { useAuth } from "@/context/AuthContext";
+import AddContentModal from "@/components/modals/AddContentModal";
+import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 
 export default function PublicationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"sci" | "journals" | "conferences">("sci");
+  const { isAdmin } = useAuth();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  const filteredPubs = mockPublications.filter(pub => 
-    pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pub.authors.some(a => a.toLowerCase().includes(searchTerm.toLowerCase()))
+  const handleAddClick = () => {
+    if (isAdmin) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
+  const currentData = activeTab === "sci" ? sciJournals : activeTab === "journals" ? mockPublications : internationalConferences;
+  const filteredPubs = currentData.filter(pub => 
+    pub.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pub.authors?.some(a => a.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
+      <div className="absolute top-24 right-4 sm:top-28 sm:right-8 z-50">
+        <button 
+          onClick={handleAddClick}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+        >
+          <Plus className="w-5 h-5" />
+          Add Publication
+        </button>
+      </div>
       
       {/* Header */}
       <motion.div 
@@ -30,6 +56,45 @@ export default function PublicationsPage() {
         <p className="text-xl md:text-2xl text-foreground/60 max-w-2xl font-light">
           An archive of scholarly articles, journal papers, and conference proceedings advancing the field of computer science.
         </p>
+      </motion.div>
+
+      {/* Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="flex flex-wrap gap-4 mb-8"
+      >
+        <button
+          onClick={() => setActiveTab("sci")}
+          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+            activeTab === "sci" 
+            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+          }`}
+        >
+          SCI Journals
+        </button>
+        <button
+          onClick={() => setActiveTab("journals")}
+          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+            activeTab === "journals" 
+            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+          }`}
+        >
+          Scopus Journals
+        </button>
+        <button
+          onClick={() => setActiveTab("conferences")}
+          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+            activeTab === "conferences" 
+            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+          }`}
+        >
+          International Conferences
+        </button>
       </motion.div>
 
       {/* Filters & Search */}
@@ -87,7 +152,28 @@ export default function PublicationsPage() {
                   </div>
                 </div>
                 
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex items-center gap-3 md:gap-4">
+                  {(pub.doi || pub.link) ? (
+                    <a 
+                      href={pub.doi ? `https://doi.org/${pub.doi}` : pub.link}
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onClick={(e) => e.stopPropagation()}
+                      className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-full text-sm font-bold transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" /> View
+                    </a>
+                  ) : (
+                    <a 
+                      href={`https://scholar.google.com/scholar?q=${encodeURIComponent(pub.title)}`}
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      onClick={(e) => e.stopPropagation()}
+                      className="hidden sm:flex items-center gap-2 px-4 py-2 bg-muted text-foreground/70 hover:bg-muted/80 rounded-full text-sm font-bold transition-colors"
+                    >
+                      <Search className="w-4 h-4" /> Search
+                    </a>
+                  )}
                   <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground/50">
                     <ChevronDown className="w-5 h-5" />
                   </motion.div>
@@ -107,7 +193,7 @@ export default function PublicationsPage() {
                       <div className="flex-grow space-y-6">
                         <div>
                           <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Authors</h4>
-                          <p className="text-foreground/80 font-medium">{pub.authors.join(", ")}</p>
+                          <p className="text-foreground/80 font-medium">{pub.authors?.join(", ") || "Authors not listed"}</p>
                         </div>
                         <div>
                           <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Abstract</h4>
@@ -116,21 +202,17 @@ export default function PublicationsPage() {
                           </p>
                         </div>
                         <div className="flex flex-wrap gap-4 pt-4">
-                          <button className="interactive flex items-center px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                            <FileText className="w-4 h-4 mr-2" /> Download PDF
-                          </button>
+                          {pub.link && (
+                            <a href={pub.link} target="_blank" rel="noopener noreferrer" className="interactive flex items-center px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                              <FileText className="w-4 h-4 mr-2" /> View Paper
+                            </a>
+                          )}
                           {pub.doi && (
                             <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer" className="interactive flex items-center px-6 py-3 rounded-xl bg-muted text-foreground font-bold hover:bg-muted/80 transition-colors">
                               <ExternalLink className="w-4 h-4 mr-2" /> View DOI
                             </a>
                           )}
                         </div>
-                      </div>
-                      
-                      {/* Optional Publication Visual */}
-                      <div className="hidden lg:flex w-64 h-64 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl border border-white/10 items-center justify-center flex-shrink-0 relative overflow-hidden">
-                         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-50 mix-blend-overlay"></div>
-                         <FileText className="w-24 h-24 text-primary/40" />
                       </div>
                     </div>
                   </motion.div>
@@ -140,6 +222,22 @@ export default function PublicationsPage() {
           );
         })}
       </div>
+
+      <AddContentModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        title="Add New Publication"
+        type="publication"
+      />
+
+      <PasswordPromptModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSuccess={() => {
+          setIsPasswordModalOpen(false);
+          setIsAddModalOpen(true);
+        }}
+      />
     </div>
   );
 }

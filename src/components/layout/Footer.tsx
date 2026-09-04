@@ -26,6 +26,7 @@ export default function Footer() {
                 <li key={item}>
                   <Link
                     href={`/${item.toLowerCase()}`}
+                    prefetch={true}
                     className="text-foreground/70 hover:text-primary transition-colors text-sm"
                   >
                     {item}

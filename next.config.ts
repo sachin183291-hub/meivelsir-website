@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // @ts-expect-error - aggressively hide dev indicators
+  devIndicators: false,
 };
 
 export default nextConfig;

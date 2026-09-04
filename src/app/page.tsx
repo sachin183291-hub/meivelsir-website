@@ -2,21 +2,26 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, BookOpen, Users, Award, Lightbulb, Mail, ChevronRight, FileText, Briefcase, Calendar, Trophy, Zap, Stethoscope, Cpu, Activity, Landmark } from "lucide-react";
 import { profileData, mockNews, mockExperience, mockAwards, mockResearchAreas, mockProjects } from "@/data/mockData";
+import { eventsData } from "@/data/eventsData";
 import MagneticButton from "@/components/ui/MagneticButton";
+
+const fdpCount = eventsData.filter(e => e.category === "FDP / STC / ISRO Course").length;
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full text-center">
-        <div className="flex flex-col items-center justify-center space-y-8">
+      <section className="relative pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-16">
           
-          <div className="space-y-6">
+          {/* Left Content */}
+          <div className="flex-1 max-w-xl space-y-6 text-center flex flex-col items-center">
             <div>
-              <h1 className="text-5xl md:text-7xl font-serif text-foreground leading-tight">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif text-foreground leading-tight">
                 {profileData.name}
               </h1>
               <p className="mt-4 text-xl md:text-2xl text-primary font-medium tracking-wide uppercase text-sm">
@@ -25,7 +30,7 @@ export default function Home() {
             </div>
             
             <div>
-              <p className="text-lg md:text-xl text-foreground/70 leading-relaxed max-w-2xl mx-auto font-serif">
+              <p className="text-lg md:text-xl text-foreground/70 leading-relaxed font-serif max-w-2xl mx-auto">
                 {profileData.about.summary}
               </p>
             </div>
@@ -45,13 +50,34 @@ export default function Home() {
             </div>
           </div>
           
+          {/* Right Profile Image */}
+          <div className="flex-1 w-full max-w-md flex justify-center lg:justify-end relative mt-12 md:mt-0">
+            <div className="relative w-64 sm:w-72 md:w-80 lg:w-80 aspect-[4/5] rounded-2xl md:rounded-[2rem] p-2 bg-gradient-to-tr from-primary/40 via-primary to-accent shadow-2xl">
+              <div className="w-full h-full rounded-xl md:rounded-[1.75rem] overflow-hidden border-4 border-background bg-accent flex items-center justify-center relative shadow-inner group-hover:border-primary/20 transition-colors">
+                {/* 
+                  NOTE: Ensure your image is placed at 'public/profile.jpg'
+                */}
+                <Image 
+                  src="/profile.jpg" 
+                  alt="Dr. Meivel S" 
+                  fill
+                  className="object-cover object-top hover:scale-105 transition-transform duration-700"
+                  priority
+                />
+              </div>
+            </div>
+            
+            {/* Decorative Floating Elements */}
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-primary/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+            <div className="absolute -top-8 -right-8 w-40 h-40 bg-secondary/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+          </div>
+
         </div>
       </section>
 
-      {/* --- STATS BANNER --- */}
       <div className="border-t border-border bg-accent/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
             <div>
               <p className="text-3xl font-serif font-bold text-primary">{profileData.stats.publications}+</p>
               <p className="text-sm font-medium text-foreground/60 uppercase tracking-wider mt-1">Publications</p>
@@ -67,6 +93,10 @@ export default function Home() {
             <div>
               <p className="text-3xl font-serif font-bold text-primary">{profileData.stats.students}+</p>
               <p className="text-sm font-medium text-foreground/60 uppercase tracking-wider mt-1">Students</p>
+            </div>
+            <div>
+              <p className="text-3xl font-serif font-bold text-primary">{fdpCount}+</p>
+              <p className="text-sm font-medium text-foreground/60 uppercase tracking-wider mt-1">FDP / Programs</p>
             </div>
           </div>
         </div>
@@ -214,7 +244,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Selected Projects</h2>
             <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
           </div>
-          <Link href="/projects" className="hidden md:flex items-center text-primary font-semibold hover:underline mt-4">
+          <Link href="/projects" prefetch={true} className="hidden md:flex items-center text-primary font-semibold hover:underline mt-4">
             View all projects <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -235,7 +265,7 @@ export default function Home() {
           ))}
         </div>
         <div className="mt-8 md:hidden">
-          <Link href="/projects" className="flex items-center text-primary font-semibold hover:underline">
+          <Link href="/projects" prefetch={true} className="flex items-center text-primary font-semibold hover:underline">
             View all projects <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -248,7 +278,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Selected Publications</h2>
             <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
           </div>
-          <Link href="/publications" className="hidden md:flex items-center text-primary font-semibold hover:underline mt-4">
+          <Link href="/publications" prefetch={true} className="hidden md:flex items-center text-primary font-semibold hover:underline mt-4">
             View all publications <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
@@ -279,7 +309,7 @@ export default function Home() {
         </div>
         
         <div className="mt-8 md:hidden">
-          <Link href="/publications" className="flex items-center text-primary font-semibold hover:underline">
+          <Link href="/publications" prefetch={true} className="flex items-center text-primary font-semibold hover:underline">
             View all publications <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
         </div>
