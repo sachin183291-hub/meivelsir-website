@@ -296,9 +296,12 @@ export default function Home() {
                   </p>
                 </div>
               </div>
-              <button className="px-4 py-2 border border-border rounded text-sm font-semibold hover:bg-accent transition-colors whitespace-nowrap">
+              <Link 
+                href="/publications" 
+                className="px-4 py-2 border border-border rounded text-sm font-semibold hover:bg-accent transition-colors whitespace-nowrap text-center block md:inline-block"
+              >
                 Read Paper
-              </button>
+              </Link>
             </div>
           ))}
         </div>

@@ -7,7 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import AddContentModal from "@/components/modals/AddContentModal";
-import { getCollectionData, addDocument, updateDocument, deleteDocument } from "@/lib/firestore";
 import { mockProjects } from "@/data/mockData";
 import { fundingProposals as staticFundingProposals } from "@/data/fundingData";
 
@@ -162,24 +161,29 @@ export default function ProjectsPage() {
     let isMounted = true;
     const fetchData = async () => {
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("timeout")), 5000)
-        );
-        
-        const fetchPromise = Promise.all([
-          getCollectionData("projects"),
-          getCollectionData("funding_proposals")
+        const [projectsRes, fundingRes] = await Promise.all([
+          fetch('/api/projects'),
+          fetch('/api/funding')
         ]);
-
-        const [fetchedProjects, fetchedProposals] = await Promise.race([fetchPromise, timeoutPromise]) as [Project[], FundingProposal[]];
         
-        if (isMounted) {
-          setProjects(fetchedProjects.length > 0 ? fetchedProjects : mockProjects);
-          setProposals(fetchedProposals.length > 0 ? fetchedProposals : staticFundingProposals);
-          setLoading(false);
+        if (projectsRes.ok && fundingRes.ok) {
+          const fetchedProjects = await projectsRes.json();
+          const fetchedFunding = await fundingRes.json();
+          
+          if (isMounted) {
+            setProjects(fetchedProjects.length > 0 ? fetchedProjects : mockProjects);
+            setProposals(fetchedFunding.length > 0 ? fetchedFunding : staticFundingProposals);
+            setLoading(false);
+          }
+        } else {
+          if (isMounted) {
+            setProjects(mockProjects);
+            setProposals(staticFundingProposals);
+            setLoading(false);
+          }
         }
-      } catch (err: any) {
-        // Firebase not ready - fall back to static data
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
         if (isMounted) {
           setProjects(mockProjects);
           setProposals(staticFundingProposals);
@@ -205,12 +209,14 @@ export default function ProjectsPage() {
     });
   };
 
-  const handleDeleteFunding = (id: string) => {
+  const handleDeleteFunding = async (id: string) => {
     requireAuth(async () => {
       try {
         if(confirm("Are you sure you want to delete this proposal?")) {
-          await deleteDocument("funding_proposals", id);
-          setProposals(prev => prev.filter(p => p.id !== id));
+          const res = await fetch(`/api/funding/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            setProposals(prev => prev.filter(p => p.id !== id));
+          }
         }
       } catch (error) {
         console.error("Failed to delete proposal", error);
@@ -219,19 +225,52 @@ export default function ProjectsPage() {
     });
   };
 
+
   const handleSaveFunding = async (data: FundingProposal) => {
     try {
       if (data.id) {
-        await updateDocument("funding_proposals", data.id, data);
-        setProposals(prev => prev.map(p => p.id === data.id ? { ...data } as FundingProposal : p));
+        const res = await fetch(`/api/funding/${data.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          setProposals(prev => prev.map(p => p.id === data.id ? data : p));
+        } else {
+          alert("Failed to save to database. Please check your database connection.");
+        }
       } else {
-        const added = await addDocument("funding_proposals", data) as FundingProposal;
-        setProposals(prev => [...prev, added]);
+        const res = await fetch('/api/funding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setProposals(prev => [...prev, added]);
+        } else {
+          alert("Failed to add to database. Please check your database connection.");
+        }
       }
-    } catch (error: any) {
-      console.error("Failed to save funding proposal:", error);
-      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
+    } catch (error) {
+      console.error("Failed to save funding:", error);
     }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    requireAuth(async () => {
+      try {
+        if(confirm("Are you sure you want to delete this project?")) {
+          const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            setProjects(prev => prev.filter(p => p.id !== id));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to delete project", error);
+        alert("Failed to delete from database.");
+      }
+    });
   };
 
   const handleAddProject = () => {
@@ -248,32 +287,34 @@ export default function ProjectsPage() {
     });
   };
 
-  const handleDeleteProject = (id: string) => {
-    requireAuth(async () => {
-      try {
-        if(confirm("Are you sure you want to delete this project?")) {
-          await deleteDocument("projects", id);
-          setProjects(prev => prev.filter(p => p.id !== id));
-        }
-      } catch (error) {
-        console.error("Failed to delete project", error);
-        alert("Failed to delete from database.");
-      }
-    });
-  };
-
   const handleSaveProject = async (data: any) => {
     try {
       if (data.id) {
-        await updateDocument("projects", data.id, data);
-        setProjects(prev => prev.map(p => p.id === data.id ? { ...data } as Project : p));
+        const res = await fetch(`/api/projects/${data.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          setProjects(prev => prev.map(p => p.id === data.id ? { ...data } as Project : p));
+        } else {
+          alert("Failed to save to database. Please check your database connection.");
+        }
       } else {
-        const added = await addDocument("projects", data) as Project;
-        setProjects(prev => [added, ...prev]);
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setProjects(prev => [added, ...prev]);
+        } else {
+          alert("Failed to add to database. Please check your database connection.");
+        }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to save project:", error);
-      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
     }
   };
 

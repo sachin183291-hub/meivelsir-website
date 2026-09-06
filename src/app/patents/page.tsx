@@ -8,7 +8,6 @@ import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import { Patent } from "@/types";
 import { mockPatents } from "@/data/patentsData";
-import { getCollectionData, addDocument, updateDocument, deleteDocument } from "@/lib/firestore";
 
 interface PatentDetailsModalProps {
   isOpen: boolean;
@@ -112,31 +111,40 @@ export default function PatentsPage() {
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [patents, setPatents] = useState<Patent[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingPatent, setEditingPatent] = useState<Patent | null>(null);
   const [viewingPatent, setViewingPatent] = useState<Patent | null>(null);
 
+  const requireAuth = (action: () => void) => {
+    if (isAdmin) {
+      action();
+    } else {
+      setPendingAction(() => action);
+      setIsPasswordModalOpen(true);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
     const fetchPatents = async () => {
       try {
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("timeout")), 5000)
-        );
-        const data = await Promise.race([
-          getCollectionData("patents"),
-          timeoutPromise
-        ]) as Patent[];
-        
-        if (isMounted) {
-          // If Firebase returned empty, fall back to static data
-          setPatents(data.length > 0 ? data : mockPatents);
-          setLoading(false);
+        const res = await fetch('/api/patents');
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            setPatents(data.length > 0 ? data : mockPatents);
+            setLoading(false);
+          }
+        } else {
+          if (isMounted) {
+            setPatents(mockPatents);
+            setLoading(false);
+          }
         }
-      } catch (err: any) {
-        // Firebase not ready - use static data as fallback
+      } catch (err) {
+        console.error("Failed to fetch patents:", err);
         if (isMounted) {
           setPatents(mockPatents);
           setLoading(false);
@@ -167,26 +175,50 @@ export default function PatentsPage() {
   };
 
   const handleSave = async (data: any) => {
-    // Try Firebase, fall back to local state
-    const id = data.id || editingPatent?.id;
-    const tempId = id || Date.now().toString();
-    const newData = { ...data, id: tempId };
     try {
-      if (id) {
-        await updateDocument("patents", id, data);
-        setPatents(prev => prev.map(p => p.id === id ? newData as Patent : p));
+      if (data.id) {
+        const res = await fetch(`/api/patents/${data.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          setPatents(prev => prev.map(p => p.id === data.id ? { ...data } as Patent : p));
+        } else {
+          alert("Failed to save to database. Please check your database connection.");
+        }
       } else {
-        const added = await addDocument("patents", data);
-        setPatents(prev => [added as Patent, ...prev]);
+        const res = await fetch('/api/patents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setPatents(prev => [added, ...prev]);
+        } else {
+          alert("Failed to add to database. Please check your database connection.");
+        }
       }
-    } catch {
-      // Firebase not ready - save locally for this session
-      if (id) {
-        setPatents(prev => prev.map(p => p.id === id ? newData as Patent : p));
-      } else {
-        setPatents(prev => [newData as Patent, ...prev]);
-      }
+    } catch (error) {
+      console.error("Failed to save patent:", error);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    requireAuth(async () => {
+      try {
+        if(confirm("Are you sure you want to delete this patent?")) {
+          const res = await fetch(`/api/patents/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            setPatents(prev => prev.filter(p => p.id !== id));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to delete patent:", error);
+        alert("Failed to delete from database.");
+      }
+    });
   };
 
   if (loading) {
@@ -313,10 +345,16 @@ export default function PatentsPage() {
 
       <PasswordPromptModal
         isOpen={isPasswordModalOpen}
-        onClose={() => { setIsPasswordModalOpen(false); setEditingPatent(null); }}
+        onClose={() => {
+          setIsPasswordModalOpen(false);
+          setPendingAction(null);
+        }}
         onSuccess={() => {
           setIsPasswordModalOpen(false);
-          setIsAddModalOpen(true);
+          if (pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+          }
         }}
       />
 

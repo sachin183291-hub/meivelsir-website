@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  title         String
+  role          String
+  fundingAgency String
+  amount        String
+  duration      String
+  status        String
+  domain        String
+  description   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Patent {
+  id                String   @id @default(cuid())
+  title             String
+  inventors         String[] // PostgreSQL supports string arrays
+  patentNumber      String
+  applicationNumber String
+  filingDate        String
+  grantDate         String?
+  country           String
+  status            String
+  technologyArea    String
+  description       String
+  link              String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model FundingProposal {
+  id            String   @id @default(cuid())
+  organization  String
+  investigator  String
+  yearsApplied  String
+  applied       Int?
+  confirmed     String?
+  fundedGranted String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
