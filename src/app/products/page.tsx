@@ -58,23 +58,23 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen relative">
-      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
-        <button 
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Add Product
-        </button>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 min-h-screen">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="space-y-8"
       >
-        <div className="text-center space-y-4 mb-12">
+        <div className="text-center space-y-4 mb-12 relative">
+          <div className="flex justify-center sm:justify-end mb-4 sm:mb-0 sm:absolute sm:right-0 sm:top-0">
+            <button 
+              onClick={handleAddClick}
+              className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-md hover:shadow-lg transition-all text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Product
+            </button>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground">Products & Innovations</h1>
           <div className="h-1 w-24 bg-primary mx-auto rounded-full"></div>
         </div>

@@ -52,19 +52,14 @@ export default function Home() {
           
           {/* Right Profile Image */}
           <div className="flex-1 w-full max-w-md flex justify-center lg:justify-end relative mt-12 md:mt-0">
-            <div className="relative w-64 sm:w-72 md:w-80 lg:w-80 aspect-[4/5] rounded-2xl md:rounded-[2rem] p-2 bg-gradient-to-tr from-primary/40 via-primary to-accent shadow-2xl">
-              <div className="w-full h-full rounded-xl md:rounded-[1.75rem] overflow-hidden border-4 border-background bg-accent flex items-center justify-center relative shadow-inner group-hover:border-primary/20 transition-colors">
-                {/* 
-                  NOTE: Ensure your image is placed at 'public/profile.jpg'
-                */}
-                <Image 
-                  src="/profile.jpg" 
-                  alt="Dr. Meivel S" 
-                  fill
-                  className="object-cover object-top hover:scale-105 transition-transform duration-700"
-                  priority
-                />
-              </div>
+            <div className="relative w-64 sm:w-72 md:w-80 lg:w-80 aspect-[2/3] rounded-3xl overflow-hidden shadow-2xl">
+              <Image 
+                src="/sketch-profile.png" 
+                alt="Dr. Meivel S" 
+                fill
+                className="object-cover hover:scale-105 transition-transform duration-700"
+                priority
+              />
             </div>
             
             {/* Decorative Floating Elements */}

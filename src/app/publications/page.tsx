@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus } from "lucide-react";
+import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Quote } from "lucide-react";
 import { mockPublications, sciJournals } from "@/data/publicationsData";
 import { internationalConferences } from "@/data/conferencesData";
 import { useAuth } from "@/context/AuthContext";
@@ -11,8 +11,10 @@ import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 
 export default function PublicationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedYear, setSelectedYear] = useState<string>("All");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"sci" | "journals" | "conferences">("sci");
+  
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -25,36 +27,56 @@ export default function PublicationsPage() {
     }
   };
 
-  const currentData = activeTab === "sci" ? sciJournals : activeTab === "journals" ? mockPublications : internationalConferences;
-  const filteredPubs = currentData.filter(pub => 
-    pub.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pub.authors?.some(a => a.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const currentData = useMemo(() => {
+    return activeTab === "sci" 
+      ? sciJournals 
+      : activeTab === "journals" 
+      ? mockPublications 
+      : internationalConferences;
+  }, [activeTab]);
+
+  // Extract available years for filter
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(currentData.map(p => p.year))).sort((a, b) => b - a);
+    return ["All", ...years.map(String)];
+  }, [currentData]);
+
+  const filteredPubs = useMemo(() => {
+    return currentData.filter(pub => {
+      const matchesSearch = 
+        pub.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pub.authors?.some(a => a.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        pub.journalOrConference?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesYear = selectedYear === "All" || String(pub.year) === selectedYear;
+
+      return matchesSearch && matchesYear;
+    });
+  }, [currentData, searchTerm, selectedYear]);
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative">
-      <div className="absolute top-24 right-4 sm:top-28 sm:right-8 z-50">
-        <button 
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Add Publication
-        </button>
-      </div>
-      
+    <div className="min-h-screen pt-6 sm:pt-10 md:pt-14 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="mb-16 md:mb-24"
+        transition={{ duration: 0.5 }}
+        className="mb-10 md:mb-14 relative"
       >
-        <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-foreground mb-6">
-          Selected <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Publications.</span>
+        <div className="flex justify-start sm:justify-end mb-4 sm:mb-0 sm:absolute sm:right-0 sm:top-0">
+          <button 
+            onClick={handleAddClick}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-md hover:shadow-lg transition-all text-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add Publication
+          </button>
+        </div>
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tighter text-foreground mb-4 font-serif">
+          Publications &amp; <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-600 to-secondary">Patents</span>
         </h1>
-        <p className="text-xl md:text-2xl text-foreground/60 max-w-2xl font-light">
-          An archive of scholarly articles, journal papers, and conference proceedings advancing the field of computer science.
+        <p className="text-base sm:text-lg md:text-xl text-foreground/70 max-w-2xl font-light">
+          An extensive archive of SCI Journals, Scopus indexed papers, and International Conference proceedings.
         </p>
       </motion.div>
 
@@ -62,38 +84,52 @@ export default function PublicationsPage() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-        className="flex flex-wrap gap-4 mb-8"
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="flex flex-wrap gap-3 mb-8 relative z-10"
       >
         <button
-          onClick={() => setActiveTab("sci")}
-          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+          type="button"
+          onClick={() => { setActiveTab("sci"); setSelectedYear("All"); }}
+          className={`px-5 sm:px-7 py-3 rounded-xl font-bold text-sm sm:text-base transition-all flex-grow md:flex-grow-0 flex items-center justify-center gap-2 ${
             activeTab === "sci" 
-            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
-            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-accent"
           }`}
         >
-          SCI Journals
+          <span>SCI Journals</span>
+          <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "sci" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+            {sciJournals.length}
+          </span>
         </button>
+
         <button
-          onClick={() => setActiveTab("journals")}
-          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+          type="button"
+          onClick={() => { setActiveTab("journals"); setSelectedYear("All"); }}
+          className={`px-5 sm:px-7 py-3 rounded-xl font-bold text-sm sm:text-base transition-all flex-grow md:flex-grow-0 flex items-center justify-center gap-2 ${
             activeTab === "journals" 
-            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
-            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-accent"
           }`}
         >
-          Scopus Journals
+          <span>Scopus Journals</span>
+          <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "journals" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+            {mockPublications.length}
+          </span>
         </button>
+
         <button
-          onClick={() => setActiveTab("conferences")}
-          className={`px-8 py-4 rounded-2xl font-bold transition-all flex-grow md:flex-grow-0 ${
+          type="button"
+          onClick={() => { setActiveTab("conferences"); setSelectedYear("All"); }}
+          className={`px-5 sm:px-7 py-3 rounded-xl font-bold text-sm sm:text-base transition-all flex-grow md:flex-grow-0 flex items-center justify-center gap-2 ${
             activeTab === "conferences" 
-            ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(14,165,233,0.3)] scale-105" 
-            : "bg-card border border-border text-foreground/70 hover:bg-muted"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105" 
+            : "bg-card border border-border text-foreground/70 hover:bg-accent"
           }`}
         >
-          International Conferences
+          <span>Conferences</span>
+          <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "conferences" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+            {internationalConferences.length}
+          </span>
         </button>
       </motion.div>
 
@@ -101,118 +137,174 @@ export default function PublicationsPage() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-        className="flex flex-col md:flex-row gap-4 mb-12"
+        transition={{ delay: 0.2, duration: 0.4 }}
+        className="flex flex-col sm:flex-row gap-4 mb-8"
       >
+        {/* Search input */}
         <div className="relative flex-grow">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
           <input 
             type="text" 
-            placeholder="Search publications by title or author..." 
+            placeholder="Search by title, author, or journal..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-card/50 backdrop-blur-md border border-border rounded-2xl py-4 pl-12 pr-4 text-foreground focus:outline-none focus:border-primary transition-colors"
+            className="w-full bg-card border border-border rounded-xl py-3 pl-12 pr-4 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm sm:text-base transition-all shadow-sm"
           />
         </div>
-        <button className="interactive flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-card border border-border hover:bg-muted transition-colors font-bold">
-          <Filter className="w-5 h-5" /> Filter by Year
-        </button>
+
+        {/* Year Filter Dropdown */}
+        <div className="relative shrink-0 flex items-center">
+          <Filter className="absolute left-3 w-4 h-4 text-foreground/50 pointer-events-none" />
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="bg-card border border-border text-foreground font-semibold rounded-xl py-3 pl-9 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none cursor-pointer shadow-sm w-full sm:w-auto"
+          >
+            <option value="All">All Years</option>
+            {availableYears.filter(y => y !== "All").map(year => (
+              <option key={year} value={year}>Year {year}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3 w-4 h-4 text-foreground/50 pointer-events-none" />
+        </div>
       </motion.div>
 
       {/* Editorial List */}
       <div className="space-y-4">
         {filteredPubs.map((pub, index) => {
           const isExpanded = expandedId === pub.id;
-          
+          const doiUrl = pub.doi ? `https://doi.org/${pub.doi}` : null;
+          const scholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(pub.title)}`;
+          const paperUrl = doiUrl || pub.link || scholarUrl;
+
           return (
             <motion.div 
               key={pub.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className={`group overflow-hidden rounded-3xl border transition-all duration-500 cursor-pointer ${isExpanded ? 'bg-card border-primary/50 shadow-[0_0_50px_rgba(14,165,233,0.1)]' : 'bg-transparent border-border hover:border-primary/30 hover:bg-card/30'}`}
-              onClick={() => setExpandedId(isExpanded ? null : pub.id)}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.03, 0.3), duration: 0.3 }}
+              className={`group overflow-hidden rounded-2xl border transition-all duration-300 ${
+                isExpanded 
+                  ? 'bg-card border-primary/50 shadow-md ring-1 ring-primary/20' 
+                  : 'bg-card/70 border-border/60 hover:border-primary/40 hover:bg-card shadow-sm'
+              }`}
             >
-              <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-start md:items-center gap-6 md:gap-12 flex-grow">
-                  <span className={`text-3xl md:text-5xl font-light transition-colors duration-500 ${isExpanded ? 'text-primary' : 'text-foreground/20 group-hover:text-foreground/40'}`}>
+              <div 
+                className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer"
+                onClick={() => setExpandedId(isExpanded ? null : pub.id)}
+              >
+                <div className="flex items-start gap-4 flex-grow">
+                  <span className={`text-2xl sm:text-3xl font-black transition-colors shrink-0 ${
+                    isExpanded ? 'text-primary' : 'text-foreground/30 group-hover:text-primary/70'
+                  }`}>
                     {(index + 1).toString().padStart(2, '0')}
                   </span>
-                  <div>
-                    <h3 className={`text-xl md:text-3xl font-bold transition-colors duration-300 ${isExpanded ? 'text-primary' : 'text-foreground group-hover:text-primary/80'}`}>
+                  
+                  <div className="space-y-1.5 flex-grow">
+                    <h3 className={`text-base sm:text-xl font-bold leading-snug transition-colors ${
+                      isExpanded ? 'text-primary' : 'text-foreground group-hover:text-primary'
+                    }`}>
                       {pub.title}
                     </h3>
-                    <p className="text-foreground/60 mt-2 font-medium flex items-center gap-2 flex-wrap">
-                      <span className="text-foreground">{pub.year}</span>
-                      <span className="w-1 h-1 rounded-full bg-foreground/30"></span>
-                      <span>{pub.journalOrConference}</span>
-                      <span className="w-1 h-1 rounded-full bg-foreground/30"></span>
-                      <span className="text-primary">{pub.type}</span>
-                    </p>
+                    
+                    <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-foreground/70 font-medium">
+                      <span className="px-2 py-0.5 bg-primary/10 text-primary font-bold rounded">
+                        {pub.year}
+                      </span>
+                      <span>•</span>
+                      <span className="text-foreground/80 line-clamp-1">{pub.journalOrConference}</span>
+                      {pub.volume && (
+                        <>
+                          <span>•</span>
+                          <span className="text-foreground/60">Vol. {pub.volume}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-                
-                <div className="flex-shrink-0 flex items-center gap-3 md:gap-4">
-                  {(pub.doi || pub.link) ? (
-                    <a 
-                      href={pub.doi ? `https://doi.org/${pub.doi}` : pub.link}
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => e.stopPropagation()}
-                      className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-full text-sm font-bold transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" /> View
-                    </a>
-                  ) : (
-                    <a 
-                      href={`https://scholar.google.com/scholar?q=${encodeURIComponent(pub.title)}`}
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => e.stopPropagation()}
-                      className="hidden sm:flex items-center gap-2 px-4 py-2 bg-muted text-foreground/70 hover:bg-muted/80 rounded-full text-sm font-bold transition-colors"
-                    >
-                      <Search className="w-4 h-4" /> Search
-                    </a>
-                  )}
-                  <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-foreground/50">
-                    <ChevronDown className="w-5 h-5" />
-                  </motion.div>
+
+                {/* Right side Action Buttons - ALWAYS VISIBLE ON MOBILE */}
+                <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40 justify-between sm:justify-end">
+                  <a 
+                    href={paperUrl}
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-bold shadow-sm hover:bg-primary/90 transition-all"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>{pub.doi ? "DOI" : "View"}</span>
+                  </a>
+
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setExpandedId(isExpanded ? null : pub.id);
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-accent text-foreground/70 hover:text-foreground text-xs font-semibold transition-colors"
+                  >
+                    <span>{isExpanded ? "Hide" : "Details"}</span>
+                    <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                      <ChevronDown className="w-4 h-4" />
+                    </motion.div>
+                  </button>
                 </div>
               </div>
 
-              {/* Expandable Content */}
+              {/* Expandable Details Content */}
               <AnimatePresence>
                 {isExpanded && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <div className="px-6 md:px-8 pb-8 pt-4 border-t border-border/50 flex flex-col md:flex-row gap-8">
-                      <div className="flex-grow space-y-6">
+                    <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-border/40 bg-accent/20 space-y-4 text-sm">
+                      <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Authors</h4>
+                        <p className="text-foreground/90 font-medium leading-relaxed">
+                          {pub.authors?.join(", ") || "Authors not listed"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Journal / Publication Venue</h4>
+                        <p className="text-foreground/80 font-medium">
+                          {pub.journalOrConference} {pub.pages ? `(Pages: ${pub.pages})` : ""}
+                        </p>
+                      </div>
+
+                      {pub.abstract && (
                         <div>
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Authors</h4>
-                          <p className="text-foreground/80 font-medium">{pub.authors?.join(", ") || "Authors not listed"}</p>
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Abstract</h4>
-                          <p className="text-foreground/70 leading-relaxed max-w-3xl">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Abstract</h4>
+                          <p className="text-foreground/75 leading-relaxed text-xs sm:text-sm">
                             {pub.abstract}
                           </p>
                         </div>
-                        <div className="flex flex-wrap gap-4 pt-4">
-                          {pub.link && (
-                            <a href={pub.link} target="_blank" rel="noopener noreferrer" className="interactive flex items-center px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-                              <FileText className="w-4 h-4 mr-2" /> View Paper
-                            </a>
-                          )}
-                          {pub.doi && (
-                            <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener noreferrer" className="interactive flex items-center px-6 py-3 rounded-xl bg-muted text-foreground font-bold hover:bg-muted/80 transition-colors">
-                              <ExternalLink className="w-4 h-4 mr-2" /> View DOI
-                            </a>
-                          )}
-                        </div>
+                      )}
+
+                      {/* Action Links */}
+                      <div className="flex flex-wrap gap-2.5 pt-2 border-t border-border/40">
+                        {doiUrl && (
+                          <a 
+                            href={doiUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-bold text-xs shadow-sm hover:bg-primary/90 transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" /> View Publisher DOI
+                          </a>
+                        )}
+
+                        <a 
+                          href={scholarUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border text-foreground font-bold text-xs hover:bg-accent transition-colors"
+                        >
+                          <Search className="w-3.5 h-3.5 text-primary" /> Google Scholar Search
+                        </a>
                       </div>
                     </div>
                   </motion.div>
@@ -221,6 +313,22 @@ export default function PublicationsPage() {
             </motion.div>
           );
         })}
+
+        {filteredPubs.length === 0 && (
+          <div className="text-center py-16 bg-card rounded-2xl border border-border p-8">
+            <BookOpen className="w-12 h-12 text-primary/40 mx-auto mb-3" />
+            <h3 className="text-xl font-bold text-foreground mb-1">No Publications Found</h3>
+            <p className="text-foreground/60 text-sm max-w-md mx-auto">
+              No matching publications were found for "{searchTerm}" in {selectedYear === "All" ? "all years" : selectedYear}. Please try clearing filters.
+            </p>
+            <button
+              onClick={() => { setSearchTerm(""); setSelectedYear("All"); }}
+              className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-xs"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
       </div>
 
       <AddContentModal 
@@ -241,3 +349,4 @@ export default function PublicationsPage() {
     </div>
   );
 }
+

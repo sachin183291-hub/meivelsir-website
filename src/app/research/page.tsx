@@ -49,28 +49,27 @@ export default function ResearchPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
-      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
-        <button 
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Add Research Domain
-        </button>
-      </div>
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="space-y-20"
+        className="space-y-16"
       >
         {/* Header */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 relative">
+          <div className="flex justify-center sm:justify-end mb-4 sm:mb-0 sm:absolute sm:right-0 sm:top-0">
+            <button 
+              onClick={handleAddClick}
+              className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-md hover:shadow-lg transition-all text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Research Domain
+            </button>
+          </div>
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground">Research & Innovation</h1>
           <div className="h-1 w-24 bg-primary mx-auto rounded"></div>
-          <p className="max-w-2xl mx-auto text-xl text-foreground/70 font-serif mt-6">
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-foreground/70 font-serif mt-6">
             Exploring the frontiers of technology to build intelligent, secure, and connected systems.
           </p>
         </div>
@@ -164,7 +163,7 @@ export default function ResearchPage() {
         isOpen={isAddModalOpen} 
         onClose={() => setIsAddModalOpen(false)} 
         title="Add Research Domain"
-        type="research" as any
+        type="research"
       />
 
       <PasswordPromptModal

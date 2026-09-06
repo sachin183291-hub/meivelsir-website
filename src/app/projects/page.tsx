@@ -2,12 +2,14 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Building, Plus, Pencil, Trash2, X, CheckCircle } from "lucide-react";
-import { mockProjects } from "@/data/mockData";
-import { fundingProposals as initialFundingProposals } from "@/data/fundingData";
-import { FundingProposal } from "@/types";
+import { FundingProposal, Project } from "@/types";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
+import AddContentModal from "@/components/modals/AddContentModal";
+import { getCollectionData, addDocument, updateDocument, deleteDocument } from "@/lib/firestore";
+import { mockProjects } from "@/data/mockData";
+import { fundingProposals as staticFundingProposals } from "@/data/fundingData";
 
 interface FundingModalProps {
   isOpen: boolean;
@@ -137,9 +139,13 @@ function FundingModal({ isOpen, onClose, onSave, initialData }: FundingModalProp
 
 export default function ProjectsPage() {
   const { isAdmin } = useAuth();
-  const [proposals, setProposals] = useState<FundingProposal[]>(initialFundingProposals);
+  const [proposals, setProposals] = useState<FundingProposal[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingProposal, setEditingProposal] = useState<FundingProposal | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isFundingModalOpen, setIsFundingModalOpen] = useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
@@ -151,6 +157,39 @@ export default function ProjectsPage() {
       setIsPasswordModalOpen(true);
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("timeout")), 5000)
+        );
+        
+        const fetchPromise = Promise.all([
+          getCollectionData("projects"),
+          getCollectionData("funding_proposals")
+        ]);
+
+        const [fetchedProjects, fetchedProposals] = await Promise.race([fetchPromise, timeoutPromise]) as [Project[], FundingProposal[]];
+        
+        if (isMounted) {
+          setProjects(fetchedProjects.length > 0 ? fetchedProjects : mockProjects);
+          setProposals(fetchedProposals.length > 0 ? fetchedProposals : staticFundingProposals);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        // Firebase not ready - fall back to static data
+        if (isMounted) {
+          setProjects(mockProjects);
+          setProposals(staticFundingProposals);
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAddFunding = () => {
     requireAuth(() => {
@@ -167,25 +206,89 @@ export default function ProjectsPage() {
   };
 
   const handleDeleteFunding = (id: string) => {
-    requireAuth(() => {
-      setProposals(prev => prev.filter(p => p.id !== id));
+    requireAuth(async () => {
+      try {
+        if(confirm("Are you sure you want to delete this proposal?")) {
+          await deleteDocument("funding_proposals", id);
+          setProposals(prev => prev.filter(p => p.id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete proposal", error);
+        alert("Failed to delete from database.");
+      }
     });
   };
 
-  const handleSaveFunding = (data: FundingProposal) => {
-    setProposals(prev => {
-      const exists = prev.find(p => p.id === data.id);
-      if (exists) {
-        return prev.map(p => p.id === data.id ? data : p);
+  const handleSaveFunding = async (data: FundingProposal) => {
+    try {
+      if (data.id) {
+        await updateDocument("funding_proposals", data.id, data);
+        setProposals(prev => prev.map(p => p.id === data.id ? { ...data } as FundingProposal : p));
+      } else {
+        const added = await addDocument("funding_proposals", data) as FundingProposal;
+        setProposals(prev => [...prev, added]);
       }
-      return [...prev, data];
+    } catch (error: any) {
+      console.error("Failed to save funding proposal:", error);
+      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
+    }
+  };
+
+  const handleAddProject = () => {
+    requireAuth(() => {
+      setEditingProject(null);
+      setIsProjectModalOpen(true);
     });
+  };
+
+  const handleEditProject = (project: Project) => {
+    requireAuth(() => {
+      setEditingProject(project);
+      setIsProjectModalOpen(true);
+    });
+  };
+
+  const handleDeleteProject = (id: string) => {
+    requireAuth(async () => {
+      try {
+        if(confirm("Are you sure you want to delete this project?")) {
+          await deleteDocument("projects", id);
+          setProjects(prev => prev.filter(p => p.id !== id));
+        }
+      } catch (error) {
+        console.error("Failed to delete project", error);
+        alert("Failed to delete from database.");
+      }
+    });
+  };
+
+  const handleSaveProject = async (data: any) => {
+    try {
+      if (data.id) {
+        await updateDocument("projects", data.id, data);
+        setProjects(prev => prev.map(p => p.id === data.id ? { ...data } as Project : p));
+      } else {
+        const added = await addDocument("projects", data) as Project;
+        setProjects(prev => [added, ...prev]);
+      }
+    } catch (error: any) {
+      console.error("Failed to save project:", error);
+      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
+    }
   };
 
   // Totals
   const totalApplied = proposals.reduce((sum, p) => sum + (Number(p.applied) || 0), 0);
   const totalConfirmed = proposals.reduce((sum, p) => sum + (Number(p.confirmed) || 0), 0);
   const totalFunded = proposals.reduce((sum, p) => sum + (Number(p.fundedGranted) || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-32 pb-16 px-4 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen relative">
@@ -292,21 +395,37 @@ export default function ProjectsPage() {
 
         {/* Funded Projects Details */}
         <section>
-          <div className="mb-8">
+          <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-foreground flex items-center gap-3">
               <Briefcase className="text-primary w-6 h-6" /> Funded Projects Details
             </h2>
+            <button
+              onClick={handleAddProject}
+              className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm"
+            >
+              <Plus className="w-4 h-4" /> Add Project
+            </button>
           </div>
           <div className="space-y-6">
-            {mockProjects.map((project, index) => (
+            {projects.map((project, index) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="academic-card p-6 md:p-8 flex flex-col md:flex-row gap-6"
+                className="academic-card p-6 md:p-8 flex flex-col md:flex-row gap-6 relative group"
               >
-                <div className="md:w-1/3 space-y-4 border-b md:border-b-0 md:border-r border-border pb-4 md:pb-0 md:pr-6">
+                {/* Edit Action */}
+                <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => handleEditProject(project)}
+                    className="p-2 bg-background border border-border text-foreground/60 hover:text-primary hover:border-primary/50 rounded-full shadow-sm transition-all"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="md:w-1/3 space-y-4 border-b md:border-b-0 md:border-r border-border pb-4 md:pb-0 md:pr-6 mt-4 md:mt-0">
                   <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${
                     project.status === 'Ongoing' ? 'bg-blue-500/10 text-blue-500' : 'bg-emerald-500/10 text-emerald-500'
                   }`}>
@@ -355,6 +474,20 @@ export default function ProjectsPage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Project Add/Edit Modal */}
+      <AddContentModal 
+        isOpen={isProjectModalOpen} 
+        onClose={() => { setIsProjectModalOpen(false); setEditingProject(null); }} 
+        title={editingProject ? "Edit Project" : "Add New Project"}
+        type="project"
+        initialData={editingProject}
+        onSave={(data) => {
+          handleSaveProject(data);
+          setIsProjectModalOpen(false);
+          setEditingProject(null);
+        }}
+      />
 
       {/* Password Modal */}
       <PasswordPromptModal

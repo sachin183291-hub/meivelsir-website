@@ -4,6 +4,7 @@ import Image from "next/image";
 
 interface AddContentModalProps {
   isOpen: boolean;
+  onClose: () => void;
   title: string;
   type: "event" | "patent" | "publication" | "project" | "product" | "research" | "funding";
   initialData?: any;
@@ -306,6 +307,89 @@ export default function AddContentModal({ isOpen, onClose, title, type, initialD
                     required
                     className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
                     placeholder="e.g. 2021, 2022"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {type === "project" && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Role</label>
+                  <input 
+                    type="text" 
+                    name="role"
+                    value={formData.role || ""}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                    placeholder="e.g. Principal Investigator"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Funding Agency</label>
+                  <input 
+                    type="text" 
+                    name="fundingAgency"
+                    value={formData.fundingAgency || ""}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                    placeholder="e.g. DST / DRDO"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Amount</label>
+                  <input 
+                    type="text" 
+                    name="amount"
+                    value={formData.amount || ""}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                    placeholder="e.g. Rs. 5,00,000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Duration</label>
+                  <input 
+                    type="text" 
+                    name="duration"
+                    value={formData.duration || ""}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                    placeholder="e.g. 2023 - 2025"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Status</label>
+                  <select 
+                    name="status"
+                    value={formData.status || "Ongoing"}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                  >
+                    <option>Ongoing</option>
+                    <option>Completed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Domain</label>
+                  <input 
+                    type="text" 
+                    name="domain"
+                    value={formData.domain || ""}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/50 outline-none"
+                    placeholder="e.g. IoT / Drones"
                   />
                 </div>
               </div>

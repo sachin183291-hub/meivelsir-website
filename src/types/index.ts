@@ -35,11 +35,11 @@ export interface Patent {
 export interface Project {
   id: string;
   title: string;
-  role: "Principal Investigator" | "Co-Investigator";
+  role: string;
   fundingAgency: string;
   amount: string;
   duration: string;
-  status: "Ongoing" | "Completed" | "Upcoming";
+  status: string;
   domain: string;
   description: string;
 }

@@ -53,22 +53,21 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen relative">
-      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-50">
-        <button 
-          onClick={handleAddClick}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Add Event
-        </button>
-      </div>
-
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 min-h-screen">
       <div className="space-y-16">
-        <div className="text-center space-y-6 mb-16">
+        <div className="text-center space-y-6 mb-16 relative">
+          <div className="flex justify-center sm:justify-end mb-4 sm:mb-0 sm:absolute sm:right-0 sm:top-0">
+            <button 
+              onClick={handleAddClick}
+              className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold shadow-md hover:shadow-lg transition-all text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Event
+            </button>
+          </div>
           <h1 className="text-4xl md:text-6xl font-serif font-bold text-foreground">Events & Programs</h1>
           <div className="h-1.5 w-24 bg-gradient-to-r from-primary/50 via-primary to-primary/50 mx-auto rounded-full"></div>
-          <p className="text-foreground/70 max-w-2xl mx-auto mt-4 text-lg">
+          <p className="text-foreground/70 max-w-2xl mx-auto mt-4 text-base md:text-lg">
             Workshops, Seminars, Training Programs, and FDPs organized and attended over the years.
           </p>
         </div>
