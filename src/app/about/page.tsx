@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { profileData, mockEducation, mockExpertise, mockEstablishedLabs, mockMemberships } from "@/data/mockData";
@@ -60,16 +60,21 @@ function OrgModal({ org, onClose, onSave }: { org: Organization | null; onClose:
   );
 }
 
+const DEFAULT_ORGS: Organization[] = [
+  { id: "org-1", name: "Rootview Technologies", type: "Industry", country: "India", description: "Collaborative technology partner based in Coimbatore." },
+  { id: "org-2", name: "Sun Info Media", type: "Industry", country: "India", description: "Media and information technology collaboration based in Coimbatore." },
+];
+
 export default function AboutPage() {
   const { isAdmin } = useAuth();
-  const [orgs, setOrgs] = useState<Organization[]>([]);
+  const [orgs, setOrgs] = useState<Organization[]>(DEFAULT_ORGS);
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null);
   const [isOrgModalOpen, setIsOrgModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   useEffect(() => {
-    fetch("/api/organizations").then(r => r.ok ? r.json() : []).then(data => setOrgs(Array.isArray(data) ? data : [])).catch(() => setOrgs([]));
+    fetch("/api/organizations").then(r => r.ok ? r.json() : []).then(data => { if (Array.isArray(data) && data.length > 0) setOrgs(data); }).catch(() => {});
   }, []);
 
   const requireAuth = (action: () => void) => { if (isAdmin) { action(); } else { setPendingAction(() => action); setIsPasswordModalOpen(true); } };

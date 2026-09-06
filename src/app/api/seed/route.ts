@@ -49,13 +49,27 @@ export async function GET() {
       });
     }
 
+    // Seed Organizations
+    const defaultOrgs = [
+      { id: "org-1", name: "Rootview Technologies", type: "Industry", country: "India", description: "Collaborative technology partner based in Coimbatore.", website: null },
+      { id: "org-2", name: "Sun Info Media", type: "Industry", country: "India", description: "Media and information technology collaboration based in Coimbatore.", website: null },
+    ];
+    for (const org of defaultOrgs) {
+      await prisma.organization.upsert({
+        where: { id: org.id },
+        update: { name: org.name, type: org.type, country: org.country, description: org.description },
+        create: org,
+      });
+    }
+
     return NextResponse.json({ 
       success: true, 
       message: "Seeded successfully to PostgreSQL!",
       counts: {
         projects: mockProjects.length,
         patents: mockPatents.length,
-        fundingProposals: fundingProposals.length
+        fundingProposals: fundingProposals.length,
+        organizations: defaultOrgs.length
       }
     });
   } catch (error: any) {
