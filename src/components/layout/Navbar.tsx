@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, Download, Moon, Sun, Home, BookOpen, FlaskConical, Award, Calendar, Lightbulb, Briefcase, Info, Layers } from "lucide-react";
+import { Menu, X, ChevronDown, Download, Moon, Sun, Home, BookOpen, FlaskConical, Award, Calendar, Lightbulb, Briefcase, Info, Layers, Mail } from "lucide-react";
 import { profileData } from "@/data/mockData";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -33,6 +33,7 @@ export default function Navbar() {
     { name: "Projects", path: "/projects", icon: Briefcase },
     { name: "Events", path: "/events", icon: Calendar },
     { name: "Patents", path: "/patents", icon: Award },
+    { name: "Contact", path: "/#contact", icon: Mail },
   ];
 
   // Bottom nav items for mobile quick-access
@@ -40,7 +41,7 @@ export default function Navbar() {
     { name: "Home", path: "/", icon: Home },
     { name: "Research", path: "/research", icon: FlaskConical },
     { name: "Pubs", path: "/publications", icon: BookOpen },
-    { name: "Projects", path: "/projects", icon: Briefcase },
+    { name: "Contact", path: "/#contact", icon: Mail },
   ];
 
   return (
