@@ -15,16 +15,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
-    // Check local storage or system preference on mount
+    // Always default to light mode on initial load
+    // Only restore dark if user previously explicitly chose dark
     const savedTheme = localStorage.getItem("theme") as Theme;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    if (savedTheme === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
-      // Default to light
+      // Default to light mode (fresh visit or previously chose light)
+      setTheme("light");
       document.documentElement.classList.remove("dark");
       document.documentElement.classList.add("light");
-      setTheme("light");
     }
   }, []);
 
