@@ -27,10 +27,10 @@ export default function ContactForm() {
         const errorData = await res.json();
         throw new Error(errorData.error || "Failed to send message");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setStatus("error");
-      setErrorMessage(err.message || "An unexpected error occurred. Please try again later.");
+      setErrorMessage(err instanceof Error ? err.message : "An unexpected error occurred. Please try again later.");
       setTimeout(() => setStatus("idle"), 8000);
     }
   };
