@@ -23,12 +23,13 @@ export const profileData: ProfileData = {
     i10Index: 0,
   },
   social: {
-    googleScholar: "#",
-    orcid: "#",
-    scopus: "#",
-    researchGate: "#",
-    linkedIn: "#",
-    github: "#",
+    googleScholar: "https://scholar.google.com/citations?user=eedV8xUAAAAJ&hl=en&authuser=2",
+    orcid: "https://orcid.org/0000-0002-8717-3881",
+    scopus: "https://www.scopus.com/authid/detail.uri?authorId=57191913735",
+    researchGate: "https://www.researchgate.net/profile/S-Meivel",
+    linkedIn: "https://www.linkedin.com/in/meivel-s-b1885617a/",
+    github: "https://github.com/meivels",
+    researchId: "https://researchid.co/meivels",
   }
 };
 

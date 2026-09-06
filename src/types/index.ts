@@ -73,6 +73,7 @@ export interface ProfileData {
     researchGate: string;
     linkedIn: string;
     github: string;
+    researchId?: string;
   };
 }
 

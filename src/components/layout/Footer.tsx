@@ -40,12 +40,13 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-semibold text-foreground mb-4">Research Profiles</h4>
             <ul className="space-y-2">
-              <li><a href={profileData.social.googleScholar} className="text-foreground/70 hover:text-primary transition-colors text-sm">Google Scholar</a></li>
-              <li><a href={profileData.social.orcid} className="text-foreground/70 hover:text-primary transition-colors text-sm">ORCID</a></li>
-              <li><a href={profileData.social.scopus} className="text-foreground/70 hover:text-primary transition-colors text-sm">Scopus</a></li>
-              <li><a href={profileData.social.researchGate} className="text-foreground/70 hover:text-primary transition-colors text-sm">ResearchGate</a></li>
-              <li><a href={profileData.social.linkedIn} className="text-foreground/70 hover:text-primary transition-colors text-sm">LinkedIn</a></li>
-              <li><a href={profileData.social.github} className="text-foreground/70 hover:text-primary transition-colors text-sm">GitHub</a></li>
+              <li><a href={profileData.social.googleScholar} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">Google Scholar</a></li>
+              <li><a href={profileData.social.orcid} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">ORCID</a></li>
+              <li><a href={profileData.social.scopus} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">Scopus</a></li>
+              <li><a href={profileData.social.researchGate} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">ResearchGate</a></li>
+              <li><a href={profileData.social.linkedIn} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">LinkedIn</a></li>
+              <li><a href={profileData.social.github} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">GitHub</a></li>
+              <li><a href={profileData.social.researchId} target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-primary transition-colors text-sm">ResearchID</a></li>
             </ul>
           </div>
 

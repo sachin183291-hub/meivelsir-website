@@ -95,6 +95,9 @@ export default function Navbar() {
                   <div className="py-1">
                     <a href={profileData.social.googleScholar} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">Google Scholar</a>
                     <a href={profileData.social.orcid} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">ORCID</a>
+                    <a href={profileData.social.scopus} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">Scopus</a>
+                    <a href={profileData.social.researchGate} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">ResearchGate</a>
+                    <a href={profileData.social.researchId} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">ResearchID</a>
                     <a href={profileData.social.linkedIn} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">LinkedIn</a>
                     <a href={profileData.social.github} target="_blank" rel="noopener noreferrer" className="block px-4 py-2 text-sm text-foreground/80 hover:bg-accent hover:text-primary">GitHub</a>
                   </div>
