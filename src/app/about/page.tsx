@@ -61,8 +61,9 @@ function OrgModal({ org, onClose, onSave }: { org: Organization | null; onClose:
 }
 
 const DEFAULT_ORGS: Organization[] = [
-  { id: "org-1", name: "Rootview Technologies", type: "Industry", country: "India", description: "Collaborative technology partner based in Coimbatore." },
-  { id: "org-2", name: "Sun Info Media", type: "Industry", country: "India", description: "Media and information technology collaboration based in Coimbatore." },
+  { id: "org-1", name: "Rootview Technologies", type: "Industry", country: "India", description: "A prominent technology partner based in Coimbatore, focusing on innovative software solutions, research collaborations in AI/ML, and industry-academia joint projects." },
+  { id: "org-2", name: "Sun Info Media", type: "Industry", country: "India", description: "A media and information technology organization in Coimbatore, collaborating on digital transformation, IT solutions, and student internship programs." },
+  { id: "org-3", name: "Synovers Technologies", type: "Industry", country: "India", description: "An emerging technology company specializing in cutting-edge software development, product engineering, and collaborative research initiatives." },
 ];
 
 export default function AboutPage() {
