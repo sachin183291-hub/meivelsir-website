@@ -5,6 +5,8 @@ import { mockProjects } from "@/data/mockData";
 import { mockPatents } from "@/data/patentsData";
 import { fundingProposals } from "@/data/fundingData";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const db = getFirestore(app);
