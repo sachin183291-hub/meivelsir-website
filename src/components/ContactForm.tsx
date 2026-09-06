@@ -12,20 +12,41 @@ export default function ContactForm() {
     e.preventDefault();
     setStatus("submitting");
 
+    const web3Key = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
+
+    // If no key configured, open mailto as fallback
+    if (!web3Key || web3Key === "YOUR_KEY_HERE") {
+      const mailtoUrl = `mailto:meivels.ece@mkce.ac.in?subject=${encodeURIComponent(formData.subject || "Portfolio Contact from " + formData.name)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`)}`;
+      window.open(mailtoUrl);
+      setStatus("success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setStatus("idle"), 5000);
+      return;
+    }
+
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          access_key: web3Key,
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject || `Portfolio Contact from ${formData.name}`,
+          message: formData.message,
+          from_name: "Portfolio Contact Form",
+          redirect: false,
+        }),
       });
 
-      if (res.ok) {
+      const data = await res.json();
+
+      if (data.success) {
         setStatus("success");
         setFormData({ name: "", email: "", subject: "", message: "" });
         setTimeout(() => setStatus("idle"), 5000);
       } else {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to send message");
+        throw new Error(data.message || "Failed to send message");
       }
     } catch (err: unknown) {
       console.error(err);
