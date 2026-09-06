@@ -3,11 +3,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, ExternalLink, ShieldCheck, Plus, Pencil, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import { Patent } from "@/types";
 import { mockPatents } from "@/data/patentsData";
+import { getCollectionData, addDocument, updateDocument, deleteDocument } from "@/lib/firestore";
 
 interface PatentDetailsModalProps {
   isOpen: boolean;
@@ -112,9 +113,39 @@ export default function PatentsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   
-  const [patents, setPatents] = useState<Patent[]>(mockPatents);
+  const [patents, setPatents] = useState<Patent[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingPatent, setEditingPatent] = useState<Patent | null>(null);
   const [viewingPatent, setViewingPatent] = useState<Patent | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPatents = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("timeout")), 5000)
+        );
+        const data = await Promise.race([
+          getCollectionData("patents"),
+          timeoutPromise
+        ]) as Patent[];
+        
+        if (isMounted) {
+          // If Firebase returned empty, fall back to static data
+          setPatents(data.length > 0 ? data : mockPatents);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        // Firebase not ready - use static data as fallback
+        if (isMounted) {
+          setPatents(mockPatents);
+          setLoading(false);
+        }
+      }
+    };
+    fetchPatents();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAddClick = () => {
     if (isAdmin) {
@@ -135,16 +166,36 @@ export default function PatentsPage() {
     }
   };
 
-  const handleSave = (data: any) => {
+  const handleSave = async (data: any) => {
+    // Try Firebase, fall back to local state
     const id = data.id || editingPatent?.id;
     const tempId = id || Date.now().toString();
     const newData = { ...data, id: tempId };
-    if (id) {
-      setPatents(prev => prev.map(p => p.id === id ? newData as Patent : p));
-    } else {
-      setPatents(prev => [newData as Patent, ...prev]);
+    try {
+      if (id) {
+        await updateDocument("patents", id, data);
+        setPatents(prev => prev.map(p => p.id === id ? newData as Patent : p));
+      } else {
+        const added = await addDocument("patents", data);
+        setPatents(prev => [added as Patent, ...prev]);
+      }
+    } catch {
+      // Firebase not ready - save locally for this session
+      if (id) {
+        setPatents(prev => prev.map(p => p.id === id ? newData as Patent : p));
+      } else {
+        setPatents(prev => [newData as Patent, ...prev]);
+      }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-32 pb-16 px-4 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 min-h-screen">

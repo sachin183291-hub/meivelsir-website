@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Briefcase, Building, Plus, Pencil, Trash2, X, CheckCircle } from "lucide-react";
 import { FundingProposal, Project } from "@/types";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import AddContentModal from "@/components/modals/AddContentModal";
+import { getCollectionData, addDocument, updateDocument, deleteDocument } from "@/lib/firestore";
 import { mockProjects } from "@/data/mockData";
 import { fundingProposals as staticFundingProposals } from "@/data/fundingData";
 
@@ -138,8 +139,9 @@ function FundingModal({ isOpen, onClose, onSave, initialData }: FundingModalProp
 
 export default function ProjectsPage() {
   const { isAdmin } = useAuth();
-  const [proposals, setProposals] = useState<FundingProposal[]>(staticFundingProposals);
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [proposals, setProposals] = useState<FundingProposal[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingProposal, setEditingProposal] = useState<FundingProposal | null>(null);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isFundingModalOpen, setIsFundingModalOpen] = useState(false);
@@ -155,6 +157,39 @@ export default function ProjectsPage() {
       setIsPasswordModalOpen(true);
     }
   };
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchData = async () => {
+      try {
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("timeout")), 5000)
+        );
+        
+        const fetchPromise = Promise.all([
+          getCollectionData("projects"),
+          getCollectionData("funding_proposals")
+        ]);
+
+        const [fetchedProjects, fetchedProposals] = await Promise.race([fetchPromise, timeoutPromise]) as [Project[], FundingProposal[]];
+        
+        if (isMounted) {
+          setProjects(fetchedProjects.length > 0 ? fetchedProjects : mockProjects);
+          setProposals(fetchedProposals.length > 0 ? fetchedProposals : staticFundingProposals);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        // Firebase not ready - fall back to static data
+        if (isMounted) {
+          setProjects(mockProjects);
+          setProposals(staticFundingProposals);
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAddFunding = () => {
     requireAuth(() => {
@@ -184,13 +219,18 @@ export default function ProjectsPage() {
     });
   };
 
-  const handleSaveFunding = (data: FundingProposal) => {
-    const tempId = data.id || Date.now().toString();
-    const newData = { ...data, id: tempId };
-    if (data.id) {
-      setProposals(prev => prev.map(p => p.id === data.id ? newData : p));
-    } else {
-      setProposals(prev => [...prev, newData]);
+  const handleSaveFunding = async (data: FundingProposal) => {
+    try {
+      if (data.id) {
+        await updateDocument("funding_proposals", data.id, data);
+        setProposals(prev => prev.map(p => p.id === data.id ? { ...data } as FundingProposal : p));
+      } else {
+        const added = await addDocument("funding_proposals", data) as FundingProposal;
+        setProposals(prev => [...prev, added]);
+      }
+    } catch (error: any) {
+      console.error("Failed to save funding proposal:", error);
+      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
     }
   };
 
@@ -222,13 +262,18 @@ export default function ProjectsPage() {
     });
   };
 
-  const handleSaveProject = (data: any) => {
-    const tempId = data.id || Date.now().toString();
-    const newData = { ...data, id: tempId };
-    if (data.id) {
-      setProjects(prev => prev.map(p => p.id === data.id ? newData as Project : p));
-    } else {
-      setProjects(prev => [newData as Project, ...prev]);
+  const handleSaveProject = async (data: any) => {
+    try {
+      if (data.id) {
+        await updateDocument("projects", data.id, data);
+        setProjects(prev => prev.map(p => p.id === data.id ? { ...data } as Project : p));
+      } else {
+        const added = await addDocument("projects", data) as Project;
+        setProjects(prev => [added, ...prev]);
+      }
+    } catch (error: any) {
+      console.error("Failed to save project:", error);
+      alert("Save failed! Please check that Firebase Rules allow writes (set to: allow write: if true) and click Publish.");
     }
   };
 
