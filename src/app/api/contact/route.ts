@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 
 export async function POST(req: Request) {
   try {
@@ -12,42 +11,40 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if env vars are configured
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error("Missing EMAIL_USER or EMAIL_PASS environment variables");
+    const web3formsKey = process.env.WEB3FORMS_ACCESS_KEY || process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
+
+    if (!web3formsKey) {
+      // Fallback: still return success but log warning
+      console.warn("WEB3FORMS_ACCESS_KEY is not set. Email not sent.");
       return NextResponse.json(
-        { error: "Server configuration error: Email service is not fully set up. Please contact the administrator directly." },
+        { error: "Email service is not configured. Please contact directly at meivels.ece@mkce.ac.in" },
         { status: 500 }
       );
     }
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        access_key: web3formsKey,
+        name,
+        email,
+        subject: subject || `Portfolio Contact from ${name}`,
+        message,
+        from_name: "Portfolio Contact Form",
+      }),
     });
 
-    const mailOptions = {
-      from: `"${name}" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER, // Receive emails to the same account
-      replyTo: email,
-      subject: `Portfolio Contact: ${subject || "No Subject"} - from ${name}`,
-      html: `
-        <h3>New Contact Message from Portfolio</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject || "N/A"}</p>
-        <hr />
-        <h4>Message:</h4>
-        <p style="white-space: pre-wrap;">${message}</p>
-      `,
-    };
+    const data = await response.json();
 
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    if (data.success) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    } else {
+      return NextResponse.json(
+        { error: "Failed to send message. Please try again." },
+        { status: 500 }
+      );
+    }
   } catch (error: unknown) {
     console.error("Error sending email:", error);
     return NextResponse.json(
