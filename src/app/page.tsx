@@ -7,6 +7,7 @@ import { ArrowRight, BookOpen, Users, Award, Lightbulb, Mail, ChevronRight, File
 import { profileData, mockNews, mockExperience, mockAwards, mockResearchAreas, mockProjects } from "@/data/mockData";
 import { eventsData } from "@/data/eventsData";
 import MagneticButton from "@/components/ui/MagneticButton";
+import ContactForm from "@/components/ContactForm";
 
 const fdpCount = eventsData.filter(e => e.category === "FDP / STC / ISRO Course").length;
 
@@ -320,10 +321,23 @@ export default function Home() {
           Open to academic collaborations, research discussions, and professional inquiries.
         </p>
         
-        <a href="mailto:contact@meivel.edu" className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-md font-bold text-lg hover:bg-primary/90 transition-colors shadow-sm">
-          <Mail className="w-5 h-5 mr-3" />
-          contact@meivel.edu
-        </a>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
+          <a href="tel:+919003713212" className="flex items-center text-foreground hover:text-primary transition-colors">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4 text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <span className="font-semibold text-lg">+91 9003713212</span>
+          </a>
+          
+          <a href="mailto:meivels.ece@mkce.ac.in" className="flex items-center text-foreground hover:text-primary transition-colors">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4 text-primary">
+              <Mail className="w-6 h-6" />
+            </div>
+            <span className="font-semibold text-lg">meivels.ece@mkce.ac.in</span>
+          </a>
+        </div>
+
+        <ContactForm />
       </section>
 
     </div>
