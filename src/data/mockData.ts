@@ -16,7 +16,7 @@ export const profileData: ProfileData = {
     publications: 45,
     patents: 20,
     projects: 8,
-    students: 100, // Placeholder
+    students: 150, // Placeholder
     awards: 4,
     citations: 0, // Need accurate data if available
     hIndex: 0,
@@ -289,10 +289,10 @@ export const mockEducation: Education[] = [
 ];
 
 export const mockExpertise = [
-  "Drone Design and Development", 
-  "IoT & Embedded Systems (ESP8266, Raspberry Pi, Atmega328p)", 
-  "Remote Sensing and Multispectral Image Analysis", 
-  "Artificial Intelligence & Machine Learning", 
+  "Drone Design and Development",
+  "IoT & Embedded Systems (ESP8266, Raspberry Pi, Atmega328p)",
+  "Remote Sensing and Multispectral Image Analysis",
+  "Artificial Intelligence & Machine Learning",
   "Python Programming",
   "Agricultural Drone Surveying (Pix4D mapper)"
 ];
