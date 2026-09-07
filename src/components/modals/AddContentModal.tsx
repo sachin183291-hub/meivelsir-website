@@ -21,7 +21,10 @@ export default function AddContentModal({ isOpen, onClose, title, type, initialD
         setFormData(initialData);
         setImages(initialData.images || []);
       } else {
-        setFormData({ category: "Organized Program" }); // default category
+        const defaults: any = { category: "Organized Program" };
+        if (type === "project") defaults.status = "Ongoing";
+        if (type === "patent") defaults.status = "Filed";
+        setFormData(defaults);
         setImages([]);
       }
     }
