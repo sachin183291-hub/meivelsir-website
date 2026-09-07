@@ -87,11 +87,12 @@ export async function GET() {
     const allPubs = [...sciJournals, ...mockPublications, ...internationalConferences];
     for (const pub of allPubs) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p = pub as any;
       const pubData = { 
-        ...pub, 
-        abstract: pub.abstract || "",
-        year: Number(pub.year) || new Date().getFullYear(),
-        authors: pub.authors || [],
+        ...p, 
+        abstract: p.abstract || "",
+        year: Number(p.year) || new Date().getFullYear(),
+        authors: p.authors || [],
         createdAt: undefined, 
         updatedAt: undefined 
       } as any;
