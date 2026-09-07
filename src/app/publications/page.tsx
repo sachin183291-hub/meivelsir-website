@@ -18,6 +18,23 @@ export default function PublicationsPage() {
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [allPublications, setAllPublications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  import { useEffect } from "react";
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/publications')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (isMounted) {
+          if (data && data.length > 0) setAllPublications(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
 
   const handleAddClick = () => {
     if (isAdmin) {
@@ -27,13 +44,36 @@ export default function PublicationsPage() {
     }
   };
 
+  const handleSavePublication = async (data: any) => {
+    try {
+      const res = await fetch('/api/publications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) {
+        const added = await res.json();
+        setAllPublications([added, ...allPublications]);
+      } else {
+        alert("Failed to add publication.");
+      }
+      setIsAddModalOpen(false);
+    } catch (e) {
+      alert("Error saving publication.");
+    }
+  };
+
+  const sciData = allPublications.filter((p: any) => p.id.startsWith("sci-") || (p.type === "Journal" && p.impactFactor));
+  const scopusData = allPublications.filter((p: any) => p.id.startsWith("pub-") || (p.type === "Journal" && !p.impactFactor && !p.id.startsWith("sci-")));
+  const confData = allPublications.filter((p: any) => p.id.startsWith("conf-") || p.type === "Conference");
+
   const currentData = useMemo(() => {
     return activeTab === "sci" 
-      ? sciJournals 
+      ? sciData 
       : activeTab === "journals" 
-      ? mockPublications 
-      : internationalConferences;
-  }, [activeTab]);
+      ? scopusData 
+      : confData;
+  }, [activeTab, sciData, scopusData, confData]);
 
   // Extract available years for filter
   const availableYears = useMemo(() => {

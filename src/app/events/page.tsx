@@ -19,6 +19,21 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>(eventsData);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [viewingEvent, setViewingEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/events')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (isMounted) {
+          if (data && data.length > 0) setEvents(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
 
   const categories = ["All", "Organized Program", "Workshop", "FDP / STC / ISRO Course", "Seminar & Training"];
 
@@ -44,11 +59,35 @@ export default function EventsPage() {
     }
   };
 
-  const handleSaveEvent = (data: any) => {
-    if (editingEvent) {
-      setEvents(prev => prev.map(ev => ev.id === editingEvent.id ? { ...ev, ...data } : ev));
-    } else {
-      setEvents(prev => [{ ...data, id: `evt-new-${Date.now()}` }, ...prev]);
+  const handleSaveEvent = async (data: any) => {
+    try {
+      if (editingEvent) {
+        const res = await fetch(`/api/events/${editingEvent.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setEvents(prev => prev.map(ev => ev.id === editingEvent.id ? updated : ev));
+        } else {
+          alert("Failed to update event.");
+        }
+      } else {
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setEvents(prev => [added, ...prev]);
+        } else {
+          alert("Failed to add event.");
+        }
+      }
+    } catch (e) {
+      alert("Error saving event.");
     }
   };
 

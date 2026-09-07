@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Package, ExternalLink, Plus, Pencil } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import ViewProductModal from "@/components/modals/ViewProductModal";
@@ -39,6 +39,54 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/products')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        if (isMounted) {
+          if (data && data.length > 0) setProducts(data);
+          setLoading(false);
+        }
+      })
+      .catch(() => { if (isMounted) setLoading(false); });
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleSaveProduct = async (data: any) => {
+    try {
+      if (editingProduct) {
+        const res = await fetch(`/api/products/${editingProduct.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setProducts(products.map(p => p.id === editingProduct.id ? updated : p));
+        } else {
+          alert("Failed to update product.");
+        }
+      } else {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setProducts([added, ...products]);
+        } else {
+          alert("Failed to add product.");
+        }
+      }
+      setIsAddModalOpen(false);
+      setEditingProduct(null);
+    } catch (e) {
+      alert("Error saving product.");
+    }
+  };
 
   const handleAddClick = () => {
     if (isAdmin) {
@@ -151,15 +199,7 @@ export default function ProductsPage() {
         title={editingProduct ? "Edit Product" : "Add New Product"}
         type="product"
         initialData={editingProduct}
-        onSave={(data) => {
-          if (editingProduct) {
-            setProducts(products.map(p => p.id === editingProduct.id ? { ...data, id: p.id } : p));
-          } else {
-            setProducts([{ ...data, id: Date.now().toString() }, ...products]);
-          }
-          setIsAddModalOpen(false);
-          setEditingProduct(null);
-        }}
+        onSave={handleSaveProduct}
       />
 
       <PasswordPromptModal

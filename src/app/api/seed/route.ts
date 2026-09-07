@@ -1,10 +1,33 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { mockProjects } from "@/data/mockData";
+import { mockProjects, mockResearchAreas, mockPublications } from "@/data/mockData";
 import { mockPatents } from "@/data/patentsData";
 import { fundingProposals } from "@/data/fundingData";
+import { eventsData } from "@/data/eventsData";
+import { sciJournals, internationalConferences } from "@/data/publicationsData";
 
 export const dynamic = 'force-dynamic';
+
+const initialProducts = [
+  {
+    id: "prod-1",
+    name: "MediVision AI",
+    category: "Healthcare Diagnostic Tool",
+    description: "An AI-powered diagnostic tool capable of identifying early-stage neurological disorders from MRI scans with 95% accuracy.",
+    status: "Commercialized",
+    year: 2024,
+    tech: ["PyTorch", "React", "Python"],
+  },
+  {
+    id: "prod-2",
+    name: "SecureNode IoT",
+    category: "Smart City Infrastructure",
+    description: "A lightweight hardware-software solution for securing edge sensors in urban environments against cyber-attacks.",
+    status: "Research Prototype",
+    year: 2025,
+    tech: ["C++", "Embedded Linux", "Cryptography"],
+  }
+];
 
 export async function GET() {
   try {
@@ -12,11 +35,7 @@ export async function GET() {
     for (const project of mockProjects) {
       await prisma.project.upsert({
         where: { id: project.id },
-        update: {
-          ...project,
-          createdAt: undefined,
-          updatedAt: undefined,
-        },
+        update: { ...project, createdAt: undefined, updatedAt: undefined },
         create: project,
       });
     }
@@ -25,11 +44,7 @@ export async function GET() {
     for (const patent of mockPatents) {
       await prisma.patent.upsert({
         where: { id: patent.id },
-        update: {
-          ...patent,
-          createdAt: undefined,
-          updatedAt: undefined,
-        },
+        update: { ...patent, createdAt: undefined, updatedAt: undefined },
         create: patent,
       });
     }
@@ -46,6 +61,43 @@ export async function GET() {
         where: { id: p.id },
         update: p,
         create: p,
+      });
+    }
+
+    // Seed Events
+    for (const event of eventsData) {
+      await prisma.event.upsert({
+        where: { id: event.id },
+        update: { ...event, createdAt: undefined, updatedAt: undefined },
+        create: event,
+      });
+    }
+
+    // Seed Products
+    for (const product of initialProducts) {
+      await prisma.product.upsert({
+        where: { id: product.id },
+        update: { ...product, createdAt: undefined, updatedAt: undefined },
+        create: product,
+      });
+    }
+
+    // Seed Publications
+    const allPubs = [...sciJournals, ...mockPublications, ...internationalConferences];
+    for (const pub of allPubs) {
+      await prisma.publication.upsert({
+        where: { id: pub.id },
+        update: { ...pub, createdAt: undefined, updatedAt: undefined },
+        create: pub,
+      });
+    }
+
+    // Seed Research Areas
+    for (const area of mockResearchAreas) {
+      await prisma.researchArea.upsert({
+        where: { id: area.id },
+        update: { ...area, createdAt: undefined, updatedAt: undefined },
+        create: area,
       });
     }
 
@@ -70,7 +122,11 @@ export async function GET() {
         projects: mockProjects.length,
         patents: mockPatents.length,
         fundingProposals: fundingProposals.length,
-        organizations: defaultOrgs.length
+        organizations: defaultOrgs.length,
+        events: eventsData.length,
+        products: initialProducts.length,
+        publications: allPubs.length,
+        researchAreas: mockResearchAreas.length
       }
     });
   } catch (error: unknown) {
