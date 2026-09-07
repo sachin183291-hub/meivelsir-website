@@ -86,10 +86,12 @@ export async function GET() {
     // Seed Publications
     const allPubs = [...sciJournals, ...mockPublications, ...internationalConferences];
     for (const pub of allPubs) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pubData = { ...pub, createdAt: undefined, updatedAt: undefined } as any;
       await prisma.publication.upsert({
         where: { id: pub.id },
-        update: { ...pub, createdAt: undefined, updatedAt: undefined },
-        create: pub,
+        update: pubData,
+        create: pubData,
       });
     }
 

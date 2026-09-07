@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Plus, Pencil } from "lucide-react";
 import { eventsData } from "@/data/eventsData";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import AddContentModal from "@/components/modals/AddContentModal";

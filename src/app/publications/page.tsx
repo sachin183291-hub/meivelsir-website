@@ -85,7 +85,7 @@ export default function PublicationsPage() {
     return currentData.filter(pub => {
       const matchesSearch = 
         pub.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.authors?.some(a => a.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        pub.authors?.some((a: string) => a.toLowerCase().includes(searchTerm.toLowerCase())) ||
         pub.journalOrConference?.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesYear = selectedYear === "All" || String(pub.year) === selectedYear;
