@@ -87,7 +87,18 @@ export async function GET() {
     const allPubs = [...sciJournals, ...mockPublications, ...internationalConferences];
     for (const pub of allPubs) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const pubData = { ...pub, createdAt: undefined, updatedAt: undefined } as any;
+      const pubData = { 
+        ...pub, 
+        abstract: pub.abstract || "",
+        year: Number(pub.year) || new Date().getFullYear(),
+        authors: pub.authors || [],
+        createdAt: undefined, 
+        updatedAt: undefined 
+      } as any;
+      
+      // Remove fields not in Prisma schema for Publication
+      delete pubData.description;
+      
       await prisma.publication.upsert({
         where: { id: pub.id },
         update: pubData,
