@@ -6,12 +6,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const data = await request.json();
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    // Don't update id, createdAt, updatedAt
-    const { id: _, createdAt, updatedAt, ...updateData } = data;
+    // Extract only the valid fields for Project
+    const { title, role, fundingAgency, amount, duration, status, domain, description } = data;
     
     const project = await prisma.project.update({
       where: { id },
-      data: updateData,
+      data: { title, role, fundingAgency, amount, duration, status, domain, description },
     });
     return NextResponse.json(project);
   } catch (error) {

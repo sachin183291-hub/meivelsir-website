@@ -16,8 +16,21 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    const {
+      title = "",
+      inventors = "",
+      patentNumber = "",
+      applicationNumber = "",
+      filingDate = "",
+      grantDate = null,
+      country = "",
+      status = "Filed",
+      technologyArea = "",
+      description = "",
+      link = null
+    } = data;
     const patent = await prisma.patent.create({
-      data,
+      data: { title, inventors, patentNumber, applicationNumber, filingDate, grantDate, country, status, technologyArea, description, link },
     });
     return NextResponse.json(patent, { status: 201 });
   } catch (error) {

@@ -6,11 +6,23 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const data = await request.json();
     const resolvedParams = await params;
     const id = resolvedParams.id;
-    const { id: _, createdAt, updatedAt, ...updateData } = data;
+    const {
+      title = "",
+      inventors = "",
+      patentNumber = "",
+      applicationNumber = "",
+      filingDate = "",
+      grantDate = null,
+      country = "",
+      status = "Filed",
+      technologyArea = "",
+      description = "",
+      link = null
+    } = data;
     
     const patent = await prisma.patent.update({
       where: { id },
-      data: updateData,
+      data: { title, inventors, patentNumber, applicationNumber, filingDate, grantDate, country, status, technologyArea, description, link },
     });
     return NextResponse.json(patent);
   } catch (error) {
