@@ -435,6 +435,11 @@ export default function PublicationsPage() {
         type="publication"
         initialData={editingPublication}
         onSave={handleSavePublication}
+        onDelete={(id) => {
+          handleDeletePublication({ id });
+          setIsAddModalOpen(false);
+          setEditingPublication(null);
+        }}
       />
 
       <PasswordPromptModal

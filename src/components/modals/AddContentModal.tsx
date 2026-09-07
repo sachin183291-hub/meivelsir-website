@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Upload, XCircle } from "lucide-react";
+import { X, Upload, XCircle, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 interface AddContentModalProps {
@@ -9,9 +9,10 @@ interface AddContentModalProps {
   type: "event" | "patent" | "publication" | "project" | "product" | "research" | "funding";
   initialData?: any;
   onSave?: (data: any) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function AddContentModal({ isOpen, onClose, title, type, initialData, onSave }: AddContentModalProps) {
+export default function AddContentModal({ isOpen, onClose, title, type, initialData, onSave, onDelete }: AddContentModalProps) {
   const [formData, setFormData] = useState<any>({});
   const [images, setImages] = useState<string[]>([]);
 
@@ -447,20 +448,41 @@ export default function AddContentModal({ isOpen, onClose, title, type, initialD
             ></textarea>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-border mt-6 sticky bottom-0 bg-card">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="px-6 py-2 rounded-lg font-medium text-foreground bg-accent hover:bg-accent/80 transition-colors"
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit"
-              className="px-6 py-2 rounded-lg font-bold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-            >
-              Save
-            </button>
+          <div className="pt-4 flex justify-between gap-3 border-t border-border mt-6 sticky bottom-0 bg-card">
+            {/* Delete button - only shows when editing */}
+            {initialData && onDelete ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm("Delete பண்ணணுமா? மீளவும் மாற்ற முடியாது!")) {
+                    onDelete(initialData.id);
+                    onClose();
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-red-500 bg-red-500/10 hover:bg-red-500 hover:text-white transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </button>
+            ) : (
+              <div />
+            )}
+
+            <div className="flex gap-3">
+              <button 
+                type="button" 
+                onClick={onClose}
+                className="px-6 py-2 rounded-lg font-medium text-foreground bg-accent hover:bg-accent/80 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                className="px-6 py-2 rounded-lg font-bold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </form>
       </div>

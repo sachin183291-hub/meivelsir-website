@@ -341,6 +341,11 @@ export default function PatentsPage() {
           setIsAddModalOpen(false);
           setEditingPatent(null);
         }}
+        onDelete={(id) => {
+          handleDelete(id);
+          setIsAddModalOpen(false);
+          setEditingPatent(null);
+        }}
       />
 
       <PasswordPromptModal

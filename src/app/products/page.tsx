@@ -205,6 +205,11 @@ export default function ProductsPage() {
         type="product"
         initialData={editingProduct}
         onSave={handleSaveProduct}
+        onDelete={async (id) => {
+          const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+          if (res.ok) setProducts(prev => prev.filter(p => p.id !== id));
+          setIsAddModalOpen(false); setEditingProduct(null);
+        }}
       />
 
       <PasswordPromptModal

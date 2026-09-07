@@ -528,6 +528,11 @@ export default function ProjectsPage() {
           setIsProjectModalOpen(false);
           setEditingProject(null);
         }}
+        onDelete={(id) => {
+          handleDeleteProject(id);
+          setIsProjectModalOpen(false);
+          setEditingProject(null);
+        }}
       />
 
       {/* Password Modal */}

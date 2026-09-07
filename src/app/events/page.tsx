@@ -236,6 +236,11 @@ export default function EventsPage() {
         type="event"
         initialData={editingEvent}
         onSave={handleSaveEvent}
+        onDelete={async (id) => {
+          const res = await fetch(`/api/events/${id}`, { method: 'DELETE' });
+          if (res.ok) setEvents(prev => prev.filter(ev => ev.id !== id));
+          setIsAddModalOpen(false); setEditingEvent(null);
+        }}
       />
 
       <PasswordPromptModal
