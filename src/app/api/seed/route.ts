@@ -4,7 +4,8 @@ import { mockProjects, mockResearchAreas, mockPublications } from "@/data/mockDa
 import { mockPatents } from "@/data/patentsData";
 import { fundingProposals } from "@/data/fundingData";
 import { eventsData } from "@/data/eventsData";
-import { sciJournals, internationalConferences } from "@/data/publicationsData";
+import { sciJournals } from "@/data/publicationsData";
+import { internationalConferences } from "@/data/conferencesData";
 
 export const dynamic = 'force-dynamic';
 

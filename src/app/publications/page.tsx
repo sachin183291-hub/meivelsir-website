@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Quote } from "lucide-react";
 import { mockPublications, sciJournals } from "@/data/publicationsData";
@@ -21,7 +21,7 @@ export default function PublicationsPage() {
   const [allPublications, setAllPublications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  import { useEffect } from "react";
+
   useEffect(() => {
     let isMounted = true;
     fetch('/api/publications')
