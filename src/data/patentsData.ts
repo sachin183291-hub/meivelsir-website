@@ -4,7 +4,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-1",
     title: "An Automated Solar Drone for Surveillance and Security",
-    inventors: ["Dr. S. Meivel"],
+    inventors: "Dr. S. Meivel",
     patentNumber: "2024/06620",
     applicationNumber: "2024/06620",
     filingDate: "2024-01-01",
@@ -17,7 +17,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-2",
     title: "An Internet-of-Things Based Agricultural Sensor System",
-    inventors: ["Dr. S. Meivel", "Dr. Sridevi A"],
+    inventors: "Dr. S. Meivel, Dr. Sridevi A",
     patentNumber: "201941024498",
     applicationNumber: "201941024498",
     filingDate: "2019-06-20",
@@ -30,7 +30,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-3",
     title: "A Position Adjustable Solar Powered Wireless Mobile Charging System",
-    inventors: ["Dr. S. Meivel"],
+    inventors: "Dr. S. Meivel",
     patentNumber: "Nr.202024104993",
     applicationNumber: "Nr.202024104993",
     filingDate: "2023-01-01",
@@ -43,7 +43,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-4",
     title: "BEEE Lab Staff manual",
-    inventors: ["Dr. S. Meivel"],
+    inventors: "Dr. S. Meivel",
     patentNumber: "L-131021/2023",
     applicationNumber: "L-131021/2023",
     filingDate: "2023-01-01",
@@ -56,7 +56,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-5",
     title: "BEEE Lab Students manual",
-    inventors: ["Dr. S. Meivel"],
+    inventors: "Dr. S. Meivel",
     patentNumber: "L-130843/2023",
     applicationNumber: "L-130843/2023",
     filingDate: "2023-01-01",
@@ -69,7 +69,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-6",
     title: "Natural Compost Spraying Drone",
-    inventors: ["Dr. S. Meivel", "R&D team"],
+    inventors: "Dr. S. Meivel, R&D team",
     patentNumber: "382409-001",
     applicationNumber: "382409-001",
     filingDate: "2023-01-01",
@@ -82,7 +82,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-7",
     title: "A System for Protecting The Personal Files",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "NR 2023103671",
     applicationNumber: "NR 2023103671",
     filingDate: "2023-01-01",
@@ -95,7 +95,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-8",
     title: "Honey Harvesting Drone",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "NR 2023103672",
     applicationNumber: "NR 2023103672",
     filingDate: "2023-01-01",
@@ -108,7 +108,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-9",
     title: "Pick and Place Drone",
-    inventors: ["Dr. S. Meivel", "R&D team"],
+    inventors: "Dr. S. Meivel, R&D team",
     patentNumber: "382408-001",
     applicationNumber: "382408-001",
     filingDate: "2023-01-01",
@@ -121,7 +121,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-10",
     title: "Agriculture Drone for Spraying Nutrients",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "374847-001",
     applicationNumber: "374847-001",
     filingDate: "2022-01-01",
@@ -134,7 +134,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-11",
     title: "Method and System for Detecting Growth and Disease Conditions Based on Vegetation Indices of Plants",
-    inventors: ["Dr. S. Meivel", "Dr. Sridevi A"],
+    inventors: "Dr. S. Meivel, Dr. Sridevi A",
     patentNumber: "202141028796 A",
     applicationNumber: "202141028796 A",
     filingDate: "2021-01-01",
@@ -147,7 +147,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-12",
     title: "Unmanned Aerial Vehicle-Based System and Method for Determining Vegetation Indices",
-    inventors: ["Dr. S. Meivel", "Dr. A. Sridevi"],
+    inventors: "Dr. S. Meivel, Dr. A. Sridevi",
     patentNumber: "202141010955 A",
     applicationNumber: "202141010955 A",
     filingDate: "2020-01-01",
@@ -160,7 +160,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-13",
     title: "Design of Self-Supervisory Target Painting Drone [SSTPD]",
-    inventors: ["Dr. S. Meivel", "Dr. A. Sridevi"],
+    inventors: "Dr. S. Meivel, Dr. A. Sridevi",
     patentNumber: "2020103342",
     applicationNumber: "2020103342",
     filingDate: "2020-01-01",
@@ -173,7 +173,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-14",
     title: "Centralized Cloud Laundry Logistic Management System using IoT Enabled Laundry Terminals in Residential Locations",
-    inventors: ["Dr. S. Meivel", "R&D team"],
+    inventors: "Dr. S. Meivel, R&D team",
     patentNumber: "2020101681",
     applicationNumber: "2020101681",
     filingDate: "2020-01-01",
@@ -186,7 +186,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-15",
     title: "System and Method for Managing and Sowing Seeds Using An Unmanned Aerial Vehicle",
-    inventors: ["Dr. S. Meivel"],
+    inventors: "Dr. S. Meivel",
     patentNumber: "IN20224100450 4A",
     applicationNumber: "IN20224100450 4A",
     filingDate: "2022-01-27",
@@ -199,7 +199,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-16",
     title: "Design and Method of 16.24 GHz Micro strip Network Antenna using Underwater Wireless Communication Algorithm",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "202141053722 A",
     applicationNumber: "202141053722 A",
     filingDate: "2021-11-23",
@@ -212,7 +212,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-17",
     title: "Design and Method of Electronics Lock using Internet of Things",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "202141053738 A",
     applicationNumber: "202141053738 A",
     filingDate: "2021-11-23",
@@ -225,7 +225,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-18",
     title: "Design and Method of Automatic Industrial Appliance Controlling System [DM-AIACS]",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "202141053757 A",
     applicationNumber: "202141053757 A",
     filingDate: "2021-11-23",
@@ -238,7 +238,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-19",
     title: "Design and Method of Vegetable Delivery Drone [DMVDD]",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "202141053742 A",
     applicationNumber: "202141053742 A",
     filingDate: "2021-11-23",
@@ -251,7 +251,7 @@ export const mockPatents: Patent[] = [
   {
     id: "pat-20",
     title: "Design of Real-Time Fire Fighting Drone using IoT",
-    inventors: ["Dr. S. Meivel", "Students"],
+    inventors: "Dr. S. Meivel, Students",
     patentNumber: "202041055536 A",
     applicationNumber: "202041055536 A",
     filingDate: "2020-01-01",

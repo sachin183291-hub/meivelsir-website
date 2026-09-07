@@ -72,9 +72,9 @@ function PatentDetailsModal({ isOpen, onClose, patent, onEdit }: PatentDetailsMo
           <div>
             <span className="text-foreground/50 text-xs uppercase tracking-wider font-bold mb-2 block">Inventors</span>
             <div className="flex flex-wrap gap-2">
-              {patent.inventors.map((inv, idx) => (
+              {(Array.isArray(patent.inventors) ? patent.inventors : (patent.inventors ? patent.inventors.split(',') : [])).map((inv, idx) => (
                 <span key={idx} className="bg-accent text-foreground px-3 py-1 rounded-md text-sm font-medium border border-border">
-                  {inv}
+                  {typeof inv === 'string' ? inv.trim() : inv}
                 </span>
               ))}
             </div>
@@ -291,7 +291,7 @@ export default function PatentsPage() {
                 <div className="grid grid-cols-1 gap-y-3 text-sm w-full bg-accent/30 rounded-xl p-5 border border-border/50">
                   <div className="flex flex-col items-center mb-2">
                     <span className="text-foreground/50 text-xs uppercase tracking-wider font-bold mb-1">Inventors</span>
-                    <p className="font-medium text-foreground">{patent.inventors.join(", ")}</p>
+                    <p className="font-medium text-foreground">{Array.isArray(patent.inventors) ? patent.inventors.join(", ") : patent.inventors}</p>
                   </div>
                   <div className="flex flex-wrap gap-4 justify-center items-center">
                     <div className="flex flex-col items-center">

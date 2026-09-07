@@ -20,7 +20,7 @@ export interface Publication {
 export interface Patent {
   id: string;
   title: string;
-  inventors: string[];
+  inventors: string;
   patentNumber: string;
   applicationNumber: string;
   filingDate: string;

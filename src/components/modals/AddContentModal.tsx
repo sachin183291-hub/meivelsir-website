@@ -62,9 +62,6 @@ export default function AddContentModal({ isOpen, onClose, title, type, initialD
       finalData.tech = finalData.tech.split(",").map((t: string) => t.trim());
     }
     
-    if (type === "patent" && typeof finalData.inventors === "string") {
-      finalData.inventors = finalData.inventors.split(",").map((t: string) => t.trim());
-    }
     
     if (onSave) {
       onSave(finalData);
