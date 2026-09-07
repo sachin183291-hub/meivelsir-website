@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Plus, Pencil } from "lucide-react";
+import { Calendar, MapPin, Plus, Pencil, Trash2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
@@ -90,6 +90,20 @@ export default function EventsPage() {
     }
   };
 
+  const handleDeleteEvent = async (event: Event) => {
+    if (!confirm(`"${event.title}" delete பண்ணணுமா?`)) return;
+    try {
+      const res = await fetch(`/api/events/${event.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setEvents(prev => prev.filter(ev => ev.id !== event.id));
+      } else {
+        alert("Delete பண்ண முடியல.");
+      }
+    } catch {
+      alert("Error deleting event.");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 min-h-screen">
       <div className="space-y-16">
@@ -149,14 +163,25 @@ export default function EventsPage() {
                   {event.category}
                 </span>
 
-                {/* Edit Button */}
-                <button 
-                  onClick={(e) => { e.stopPropagation(); handleEditClick(event); }}
-                  className="absolute top-4 right-4 z-20 p-2 bg-black/40 backdrop-blur-md text-white hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm"
-                  title="Edit Event"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
+                {/* Edit & Delete Buttons */}
+                <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(event); }}
+                    className="p-2 bg-black/40 backdrop-blur-md text-white hover:bg-primary rounded-full transition-all shadow-sm"
+                    title="Edit Event"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  {isAdmin && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event); }}
+                      className="p-2 bg-black/40 backdrop-blur-md text-white hover:bg-red-500 rounded-full transition-all shadow-sm"
+                      title="Delete Event"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Content */}

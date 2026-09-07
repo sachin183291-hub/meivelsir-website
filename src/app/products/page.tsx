@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Package, ExternalLink, Plus, Pencil } from "lucide-react";
+import { Package, ExternalLink, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import AddContentModal from "@/components/modals/AddContentModal";
@@ -84,6 +84,20 @@ export default function ProductsPage() {
     }
   };
 
+  const handleDeleteProduct = async (product: Product) => {
+    if (!confirm(`"${product.name}" delete பண்ணணுமா?`)) return;
+    try {
+      const res = await fetch(`/api/products/${product.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setProducts(prev => prev.filter(p => p.id !== product.id));
+      } else {
+        alert("Delete பண்ண முடியல.");
+      }
+    } catch {
+      alert("Error deleting product.");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 min-h-screen">
       <motion.div
@@ -124,13 +138,25 @@ export default function ProductsPage() {
                   <Package className="w-16 h-16 text-primary/40 group-hover:scale-110 transition-transform duration-500 z-0" />
                 )}
 
-                <button 
-                  onClick={(e) => { e.stopPropagation(); handleEditClick(product); }}
-                  className="absolute top-4 right-4 z-20 p-2 bg-black/40 backdrop-blur-md text-white hover:bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-sm"
-                  title="Edit Product"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
+                {/* Edit & Delete Buttons */}
+                <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleEditClick(product); }}
+                    className="p-2 bg-black/40 backdrop-blur-md text-white hover:bg-primary rounded-full transition-all shadow-sm"
+                    title="Edit Product"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  {isAdmin && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteProduct(product); }}
+                      className="p-2 bg-black/40 backdrop-blur-md text-white hover:bg-red-500 rounded-full transition-all shadow-sm"
+                      title="Delete Product"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
               
               <div className="p-6 flex-grow flex flex-col space-y-4">

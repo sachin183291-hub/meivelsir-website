@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Quote } from "lucide-react";
+import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Quote, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
@@ -17,6 +17,7 @@ export default function PublicationsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [allPublications, setAllPublications] = useState<any[]>([]);
+  const [editingPublication, setEditingPublication] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
 
@@ -35,6 +36,16 @@ export default function PublicationsPage() {
   }, []);
 
   const handleAddClick = () => {
+    setEditingPublication(null);
+    if (isAdmin) {
+      setIsAddModalOpen(true);
+    } else {
+      setIsPasswordModalOpen(true);
+    }
+  };
+
+  const handleEditClick = (pub: any) => {
+    setEditingPublication(pub);
     if (isAdmin) {
       setIsAddModalOpen(true);
     } else {
@@ -44,20 +55,49 @@ export default function PublicationsPage() {
 
   const handleSavePublication = async (data: any) => {
     try {
-      const res = await fetch('/api/publications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) {
-        const added = await res.json();
-        setAllPublications([added, ...allPublications]);
+      if (editingPublication) {
+        const res = await fetch(`/api/publications/${editingPublication.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const updated = await res.json();
+          setAllPublications(prev => prev.map(p => p.id === editingPublication.id ? updated : p));
+        } else {
+          alert("Failed to update publication.");
+        }
       } else {
-        alert("Failed to add publication.");
+        const res = await fetch('/api/publications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          const added = await res.json();
+          setAllPublications([added, ...allPublications]);
+        } else {
+          alert("Failed to add publication.");
+        }
       }
       setIsAddModalOpen(false);
+      setEditingPublication(null);
     } catch (e) {
       alert("Error saving publication.");
+    }
+  };
+
+  const handleDeletePublication = async (pub: any) => {
+    if (!confirm(`"புத்தக தகவலை" delete பண்ணணுமா?`)) return;
+    try {
+      const res = await fetch(`/api/publications/${pub.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setAllPublications(prev => prev.filter(p => p.id !== pub.id));
+      } else {
+        alert("Delete பண்ண முடியல.");
+      }
+    } catch {
+      alert("Error deleting publication.");
     }
   };
 
@@ -261,7 +301,7 @@ export default function PublicationsPage() {
                   </div>
                 </div>
 
-                {/* Right side Action Buttons - ALWAYS VISIBLE ON MOBILE */}
+                {/* Right side Action Buttons */}
                 <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-border/40 justify-between sm:justify-end">
                   <a 
                     href={paperUrl}
@@ -286,6 +326,25 @@ export default function PublicationsPage() {
                       <ChevronDown className="w-4 h-4" />
                     </motion.div>
                   </button>
+
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleEditClick(pub); }}
+                        className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
+                        title="Edit"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDeletePublication(pub); }}
+                        className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -371,9 +430,11 @@ export default function PublicationsPage() {
 
       <AddContentModal 
         isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
-        title="Add New Publication"
+        onClose={() => { setIsAddModalOpen(false); setEditingPublication(null); }} 
+        title={editingPublication ? "Edit Publication" : "Add New Publication"}
         type="publication"
+        initialData={editingPublication}
+        onSave={handleSavePublication}
       />
 
       <PasswordPromptModal
