@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Plus, Pencil } from "lucide-react";
-import { eventsData } from "@/data/eventsData";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
@@ -16,7 +15,7 @@ export default function EventsPage() {
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [events, setEvents] = useState<Event[]>(eventsData);
+  const [events, setEvents] = useState<Event[]>([]);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [viewingEvent, setViewingEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);

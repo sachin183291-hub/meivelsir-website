@@ -3,8 +3,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Quote } from "lucide-react";
-import { mockPublications, sciJournals } from "@/data/publicationsData";
-import { internationalConferences } from "@/data/conferencesData";
 import { useAuth } from "@/context/AuthContext";
 import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
@@ -138,7 +136,7 @@ export default function PublicationsPage() {
         >
           <span>SCI Journals</span>
           <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "sci" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-            {sciJournals.length}
+            {sciData.length}
           </span>
         </button>
 
@@ -153,7 +151,7 @@ export default function PublicationsPage() {
         >
           <span>Scopus Journals</span>
           <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "journals" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-            {mockPublications.length}
+            {scopusData.length}
           </span>
         </button>
 
@@ -168,7 +166,7 @@ export default function PublicationsPage() {
         >
           <span>Conferences</span>
           <span className={`px-2 py-0.5 rounded-full text-xs ${activeTab === "conferences" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
-            {internationalConferences.length}
+            {confData.length}
           </span>
         </button>
       </motion.div>
