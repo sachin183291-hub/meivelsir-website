@@ -6,6 +6,11 @@ import { Search, Filter, FileText, ExternalLink, ChevronDown, Plus, BookOpen, Qu
 import { useAuth } from "@/context/AuthContext";
 import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
+import { sciJournals } from "@/data/publicationsData";
+import { internationalConferences } from "@/data/conferencesData";
+import { mockPublications } from "@/data/mockData";
+
+const fallbackPublications = [...sciJournals, ...mockPublications, ...internationalConferences];
 
 export default function PublicationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,11 +32,20 @@ export default function PublicationsPage() {
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (isMounted) {
-          if (data && data.length > 0) setAllPublications(data);
+          if (data && data.length > 0) {
+            setAllPublications(data);
+          } else {
+            setAllPublications(fallbackPublications);
+          }
           setLoading(false);
         }
       })
-      .catch(() => { if (isMounted) setLoading(false); });
+      .catch(() => { 
+        if (isMounted) {
+          setAllPublications(fallbackPublications);
+          setLoading(false);
+        }
+      });
     return () => { isMounted = false; };
   }, []);
 

@@ -10,6 +10,27 @@ import ViewProductModal from "@/components/modals/ViewProductModal";
 import { Product } from "@/types";
 import Image from "next/image";
 
+const initialProducts: Product[] = [
+  {
+    id: "prod-1",
+    name: "MediVision AI",
+    category: "Healthcare Diagnostic Tool",
+    description: "An AI-powered diagnostic tool capable of identifying early-stage neurological disorders from MRI scans with 95% accuracy.",
+    status: "Commercialized",
+    year: 2024,
+    tech: ["PyTorch", "React", "Python"],
+  },
+  {
+    id: "prod-2",
+    name: "SecureNode IoT",
+    category: "Smart City Infrastructure",
+    description: "A lightweight hardware-software solution for securing edge sensors in urban environments against cyber-attacks.",
+    status: "Research Prototype",
+    year: 2025,
+    tech: ["C++", "Embedded Linux", "Cryptography"],
+  }
+];
+
 export default function ProductsPage() {
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -25,11 +46,20 @@ export default function ProductsPage() {
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (isMounted) {
-          if (data && data.length > 0) setProducts(data);
+          if (data && data.length > 0) {
+            setProducts(data);
+          } else {
+            setProducts(initialProducts);
+          }
           setLoading(false);
         }
       })
-      .catch(() => { if (isMounted) setLoading(false); });
+      .catch(() => { 
+        if (isMounted) {
+          setProducts(initialProducts);
+          setLoading(false);
+        }
+      });
     return () => { isMounted = false; };
   }, []);
 
