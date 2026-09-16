@@ -481,11 +481,7 @@ export default function ProjectsPage() {
                   <div className="flex items-center text-sm text-foreground/70 font-medium">
                     <Building className="w-4 h-4 mr-2 text-foreground/50" /> {project.fundingAgency}
                   </div>
-                  <div className="grid grid-cols-2 gap-4 text-sm bg-background p-4 rounded-xl border border-border/50">
-                    <div>
-                      <span className="text-foreground/50 block text-xs uppercase tracking-wider mb-1">Amount</span>
-                      <span className="font-bold text-foreground">{project.amount}</span>
-                    </div>
+                  <div className="text-sm bg-background p-4 rounded-xl border border-border/50">
                     <div>
                       <span className="text-foreground/50 block text-xs uppercase tracking-wider mb-1">Duration</span>
                       <span className="font-bold text-foreground">{project.duration}</span>

@@ -9,6 +9,7 @@ import AddContentModal from "@/components/modals/AddContentModal";
 import PasswordPromptModal from "@/components/modals/PasswordPromptModal";
 import ViewEventModal from "@/components/modals/ViewEventModal";
 import { Event } from "@/types";
+import { eventsData } from "@/data/eventsData";
 
 export default function EventsPage() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -26,11 +27,20 @@ export default function EventsPage() {
       .then(res => res.ok ? res.json() : [])
       .then(data => {
         if (isMounted) {
-          if (data && data.length > 0) setEvents(data);
+          if (data && data.length > 0) {
+            setEvents(data);
+          } else {
+            setEvents(eventsData);
+          }
           setLoading(false);
         }
       })
-      .catch(() => { if (isMounted) setLoading(false); });
+      .catch(() => { 
+        if (isMounted) {
+          setEvents(eventsData);
+          setLoading(false);
+        } 
+      });
     return () => { isMounted = false; };
   }, []);
 
