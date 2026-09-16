@@ -18,7 +18,7 @@ export const profileData: ProfileData = {
     projects: 8,
     students: 150, // Placeholder
     awards: 4,
-    citations: 0, // Need accurate data if available
+    citations: 290,
     hIndex: 0,
     i10Index: 0,
   },
