@@ -121,52 +121,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- LATEST NEWS & UPDATES --- */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border">
-        <div className="mb-12 flex flex-col items-center text-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Latest News</h2>
-            <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {mockNews.map((news) => (
-            <div key={news.id} className="academic-card p-6 border-l-4 border-l-primary flex flex-col">
-              <span className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-2 flex items-center">
-                <Calendar className="w-3 h-3 mr-1" /> {news.date}
-              </span>
-              <h3 className="text-lg font-bold text-foreground mb-3">{news.title}</h3>
-              <p className="text-foreground/70 text-sm leading-relaxed flex-grow">{news.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- CORE RESEARCH AREAS --- */}
-      <section id="research" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border bg-accent/20">
-        <div className="mb-12 flex flex-col items-center text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Core Research Areas</h2>
-          <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {mockResearchAreas.map((area, idx) => (
-            <div key={area.id} className="academic-card p-8 group hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                {idx === 0 ? <Stethoscope className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" /> :
-                 idx === 1 ? <Activity className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" /> :
-                 <Cpu className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />}
-              </div>
-              <h3 className="text-xl font-bold mb-3">{area.title}</h3>
-              <p className="text-foreground/70 leading-relaxed text-sm">{area.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* --- EXPERIENCE TIMELINE --- */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border bg-accent/20">
         <div className="mb-16 text-center">
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-foreground">Professional Journey</h2>
           <div className="w-24 h-1 bg-primary mt-6 mx-auto rounded"></div>
@@ -187,7 +143,7 @@ export default function Home() {
 
                 {/* Content Card */}
                 <div className={`w-full md:w-5/12 ${index % 2 === 0 ? 'md:pl-10' : 'md:pr-10'}`}>
-                  <div className="academic-card p-8 group hover:border-primary/50 transition-colors relative overflow-hidden">
+                  <div className="academic-card p-8 group hover:border-primary/50 transition-colors relative overflow-hidden bg-background">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
                     <span className="inline-block px-3 py-1 bg-accent text-foreground/70 text-xs font-bold uppercase tracking-widest rounded mb-4">
                       {exp.duration}
@@ -203,6 +159,28 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* --- LATEST NEWS & UPDATES --- */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border">
+        <div className="mb-12 flex flex-col items-center text-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Latest News</h2>
+            <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {mockNews.map((news) => (
+            <div key={news.id} className="academic-card p-6 border-l-4 border-l-primary flex flex-col">
+              <span className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-2 flex items-center">
+                <Calendar className="w-3 h-3 mr-1" /> {news.date}
+              </span>
+              <h3 className="text-lg font-bold text-foreground mb-3">{news.title}</h3>
+              <p className="text-foreground/70 text-sm leading-relaxed flex-grow">{news.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -228,6 +206,28 @@ export default function Home() {
                 </p>
                 <p className="text-foreground/70 text-base leading-relaxed">{award.description}</p>
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- CORE RESEARCH AREAS --- */}
+      <section id="research" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-border">
+        <div className="mb-12 flex flex-col items-center text-center">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground">Core Research Areas</h2>
+          <div className="w-16 h-1 bg-primary mt-4 rounded mx-auto"></div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {mockResearchAreas.map((area, idx) => (
+            <div key={area.id} className="academic-card p-8 group hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 bg-primary/10 rounded flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
+                {idx === 0 ? <Stethoscope className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" /> :
+                 idx === 1 ? <Activity className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" /> :
+                 <Cpu className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />}
+              </div>
+              <h3 className="text-xl font-bold mb-3">{area.title}</h3>
+              <p className="text-foreground/70 leading-relaxed text-sm">{area.description}</p>
             </div>
           ))}
         </div>
